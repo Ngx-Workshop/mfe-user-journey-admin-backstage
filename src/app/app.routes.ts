@@ -1,10 +1,16 @@
 import { Route } from '@angular/router';
-import App from './app';
+import { BackstageDetailPage } from './backstage/pages/backstage-detail.page';
+import { BackstageListPage } from './backstage/pages/backstage-list.page';
 
 export const Routes: Route[] = [
-  { path: '', redirectTo: 'hello-world', pathMatch: 'full' },
+  { path: '', redirectTo: 'backstage', pathMatch: 'full' },
   {
-    path: 'hello-world',
-    component: App,
+    path: 'backstage',
+    component: BackstageListPage,
   },
+  {
+    path: 'backstage/:repo',
+    component: BackstageDetailPage,
+  },
+  { path: '**', redirectTo: 'backstage' },
 ];

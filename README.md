@@ -4,7 +4,11 @@ A user-journey micro frontend built with Angular and Module Federation.
 
 ## Overview
 
-This micro frontend is part of the NGX Workshop ecosystem and serves as a user-journey component in the overall application architecture.
+This micro frontend now ships the Backstage admin journey:
+
+- `/backstage` — catalog list with search, sync-all, and per-service refresh.
+- `/backstage/:repo` — detail view with README, OpenAPI, optional runbook and metadata, refresh + open-repo.
+- API client + facade wired to `service-backstage` using `@tmdjr/backstage-contracts` types.
 
 ## Getting Started
 
@@ -17,6 +21,7 @@ This micro frontend is part of the NGX Workshop ecosystem and serves as a user-j
 
 ```bash
 npm install
+cp public/env.example.js public/env.js # then update the URL below
 ```
 
 ### Development
@@ -28,6 +33,7 @@ npm run dev:bundle
 ```
 
 This will:
+
 - Start the webpack build in watch mode
 - Serve the bundled application on http://localhost:4201
 - Enable CORS for cross-origin requests
@@ -43,6 +49,7 @@ This will:
 ## Architecture
 
 This micro frontend uses:
+
 - **Angular 20+** - Frontend framework
 - **Module Federation** - For micro frontend architecture
 - **Webpack** - Module bundler and build tool
