@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class ExampleCrudApiService {
   private readonly http = inject(HttpClient);
   // If you have an env token, swap this for that. Keep the trailing slash off.
-  private readonly baseUrl = '/api/example-crud/';
+  private readonly baseUrl = '/api/backstage/example-crud';
 
   list$(): Observable<ExampleMongodbDocDto[]> {
     return this.http.get<ExampleMongodbDocDto[]>(this.baseUrl);
