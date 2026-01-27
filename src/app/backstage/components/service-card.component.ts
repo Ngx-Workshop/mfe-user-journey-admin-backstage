@@ -2,9 +2,8 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Input,
-  Output,
+  input,
+  output,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,7 +14,6 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
 
 @Component({
   selector: 'ngx-backstage-service-card',
-  standalone: true,
   imports: [
     CommonModule,
     MatCardModule,
@@ -29,20 +27,26 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
       <mat-card-header>
         <div class="title-row">
           <div class="titles">
-            <div class="name">{{ service.repoName }}</div>
-            @if(service.description) {
-            <div class="desc">{{ service.description }}</div>
+            <div class="name">{{ service().repoName }}</div>
+            @if (service().description) {
+            <div class="desc">{{ service().description }}</div>
             }
           </div>
           <span
             class="status"
-            [ngClass]="statusClass(service.syncStatus)"
-            [matTooltip]="statusTooltip(service.syncStatus)"
+            [class.ok]="service().syncStatus === 'ok'"
+            [class.failed]="service().syncStatus === 'failed'"
+            [class.partial]="service().syncStatus === 'partial'"
+            [class.rate_limited]="
+              service().syncStatus === 'rate_limited'
+            "
+            [class.idle]="service().syncStatus === 'idle'"
+            [matTooltip]="statusTooltip(service().syncStatus)"
           >
             <mat-icon inline class="status-icon">
-              {{ statusIcon(service.syncStatus) }}
+              {{ statusIcon(service().syncStatus) }}
             </mat-icon>
-            {{ service.syncStatus }}
+            {{ service().syncStatus }}
           </span>
         </div>
       </mat-card-header>
@@ -50,10 +54,10 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
       <mat-card-content>
         <div
           class="chips"
-          *ngIf="service.topics.length; else noTopics"
+          *ngIf="service().topics.length; else noTopics"
         >
           <mat-chip-set>
-            @for (topic of service.topics; track topic) {
+            @for (topic of service().topics; track topic) {
             <mat-chip appearance="outlined">{{ topic }}</mat-chip>
             }
           </mat-chip-set>
@@ -68,16 +72,16 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
             <span>
               Last sync:
               {{
-                service.lastSyncAt
-                  ? (service.lastSyncAt | date : 'short')
+                service().lastSyncAt
+                  ? (service().lastSyncAt | date : 'short')
                   : 'Never'
               }}
             </span>
           </div>
-          @if(service.syncError) {
+          @if (service().syncError) {
           <div class="meta-row error">
             <mat-icon inline>error</mat-icon>
-            <span>{{ service.syncError }}</span>
+            <span>{{ service().syncError }}</span>
           </div>
           }
         </div>
@@ -87,7 +91,7 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
         <button
           mat-stroked-button
           color="primary"
-          (click)="view.emit(service.repoName)"
+          (click)="onView()"
           aria-label="View details"
         >
           <mat-icon>open_in_new</mat-icon>
@@ -96,7 +100,7 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
         <button
           mat-flat-button
           color="accent"
-          (click)="refresh.emit(service.repoName)"
+          (click)="onRefresh()"
           aria-label="Refresh"
         >
           <mat-icon>refresh</mat-icon>
@@ -194,13 +198,9 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceCardComponent {
-  @Input({ required: true }) service!: ServiceSummaryDto;
-  @Output() view = new EventEmitter<string>();
-  @Output() refresh = new EventEmitter<string>();
-
-  statusClass(status: ServiceSummaryDto['syncStatus']): string {
-    return status;
-  }
+  readonly service = input.required<ServiceSummaryDto>();
+  readonly view = output<string>();
+  readonly refresh = output<string>();
 
   statusIcon(status: ServiceSummaryDto['syncStatus']): string {
     switch (status) {
@@ -230,5 +230,13 @@ export class ServiceCardComponent {
       default:
         return 'Idle';
     }
+  }
+
+  onView() {
+    this.view.emit(this.service().repoName);
+  }
+
+  onRefresh() {
+    this.refresh.emit(this.service().repoName);
   }
 }
