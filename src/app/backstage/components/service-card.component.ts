@@ -109,7 +109,7 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
       .service-card {
         display: grid;
         gap: 0.5rem;
-
+        height: 100%;
         background-color: var(--mat-sys-surface-container-high);
         transition: all 0.2s ease;
       }
