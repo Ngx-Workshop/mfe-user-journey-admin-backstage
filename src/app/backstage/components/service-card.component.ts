@@ -76,7 +76,10 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
         <div class="chips">
           <mat-chip-set>
             @for (topic of service().topics; track topic) {
-            <mat-chip appearance="outlined">{{ topic }}</mat-chip>
+            <mat-chip appearance="outlined">
+              <i [class]="'angular'"></i>
+              {{ topic }}</mat-chip
+            >
             }
           </mat-chip-set>
         </div>
@@ -128,6 +131,7 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
         font-weight: 100;
         font-size: 2rem;
         word-break: break-word;
+        padding: 0.5em 0 0;
       }
       .desc {
         color: var(--mat-sys-on-surface-variant);
