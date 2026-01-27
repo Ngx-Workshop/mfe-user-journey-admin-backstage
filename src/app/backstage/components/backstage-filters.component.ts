@@ -26,12 +26,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   ],
   template: `
     <div class="filters">
-      <div>
-        <p class="eyebrow">Catalog</p>
-        <h1>Backstage</h1>
+      <div class="filter-row header">
+        <h3>Filters</h3>
+        <button matButton (click)="onFilterChange()">
+          <mat-icon>clear_all</mat-icon> Clear All
+        </button>
       </div>
-      <div class="header-actions">
-        <mat-form-field appearance="outline" class="search">
+
+      <div class="filter-row">
+        <mat-form-field appearance="outline" class="search-bar">
           <mat-label>Search services</mat-label>
           <input
             matInput
@@ -58,16 +61,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         >
           Include docs in list
         </mat-slide-toggle>
-
-        <button
-          mat-flat-button
-          color="primary"
-          [disabled]="syncing()"
-          (click)="onSyncAllClick()"
-        >
-          <mat-icon>sync</mat-icon>
-          Sync all
-        </button>
       </div>
     </div>
   `,
@@ -87,42 +80,39 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         }
       }
 
-      .page-header {
+      .search-bar {
+        width: 100%;
+        max-width: 600px;
+      }
+
+      .filter-row {
         display: flex;
+        gap: 1rem;
         flex-wrap: wrap;
         align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
+        margin-bottom: 1rem;
+
+        &.header {
+          justify-content: space-between;
+        }
       }
-      .eyebrow {
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--mat-sys-on-surface-variant);
-        font-size: 0.8rem;
+
+      .filter-row:last-child {
+        margin-bottom: 0;
       }
-      h1 {
-        margin: 0;
+
+      .filter-row mat-form-field {
+        min-width: 200px;
       }
-      .header-actions {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.5rem;
-      }
-      .search {
-        min-width: min(360px, 100vw - 2rem);
-      }
+
       @media (max-width: 768px) {
-        .page-header {
+        .filter-row {
           flex-direction: column;
-          align-items: flex-start;
+          align-items: stretch;
         }
-        .header-actions {
-          width: 100%;
-        }
-        .search {
-          width: 100%;
+
+        .filter-row mat-form-field {
+          min-width: auto;
         }
       }
     `,
@@ -132,11 +122,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class BackstageFiltersComponent {
   readonly searchTerm = input('');
   readonly includeDocs = input(false);
-  readonly syncing = input(false);
 
   readonly queryChange = output<string>();
   readonly includeDocsChange = output<boolean>();
-  readonly syncAll = output<void>();
 
   readonly hasQuery = computed(() => !!this.searchTerm()?.trim());
 
@@ -148,9 +136,5 @@ export class BackstageFiltersComponent {
     this.includeDocsChange.emit(!!checked);
   }
 
-  onSyncAllClick() {
-    if (!this.syncing()) {
-      this.syncAll.emit();
-    }
-  }
+  onFilterChange() {}
 }

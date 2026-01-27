@@ -1,13 +1,16 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
 } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import {
   MatSnackBar,
   MatSnackBarModule,
 } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { SyncResponseDto } from '@tmdjr/backstage-contracts';
 import { NgxParticleHeader } from '@tmdjr/ngx-shared-headers';
 import { BackstageFiltersComponent } from '../components/backstage-filters.component';
@@ -17,25 +20,41 @@ import { BackstageFacadeService } from '../services/backstage-facade.service';
 @Component({
   selector: 'ngx-backstage-list-page',
   imports: [
+    MatButtonModule,
     MatSnackBarModule,
     BackstageFiltersComponent,
     BackstageResultsComponent,
     NgxParticleHeader,
+    RouterLink,
+    MatIconModule,
   ],
   template: `
-    <ngx-particle-header class="header">
-      <p class="eyebrow">Catalog</p>
-      <h1>Backstage</h1>
+    <ngx-particle-header>
+      <h1 class="header">Backstage</h1>
     </ngx-particle-header>
+    <div class="action-bar">
+      <a matButton="filled" [routerLink]="lastRouteURL()">
+        <mat-icon>arrow_back</mat-icon> Back to
+        {{ lastRouteName() }}</a
+      >
+      <div class="flex-spacer"></div>
+      <button
+        matButton="filled"
+        [disabled]="facade.syncing()"
+        (click)="onSyncAll()"
+      >
+        <mat-icon>sync</mat-icon>
+        Sync all
+      </button>
+    </div>
+
     <main class="page-content">
       <div class="container">
         <ngx-backstage-filters
           [searchTerm]="facade.search()"
           [includeDocs]="facade.includeDocs()"
-          [syncing]="facade.syncing()"
           (queryChange)="onQueryChange($event)"
           (includeDocsChange)="onIncludeDocs($event)"
-          (syncAll)="onSyncAll()"
         ></ngx-backstage-filters>
         <ngx-backstage-results
           [state]="facade.listState()"
@@ -50,24 +69,10 @@ import { BackstageFacadeService } from '../services/backstage-facade.service';
     `
       :host {
         .header {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: space-between;
-          gap: 0.75rem;
-          h1 {
-            font-size: 1.85rem;
-            font-weight: 100;
-            margin: 1.7rem 1rem;
-          }
-          .eyebrow {
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.8rem;
-          }
+          font-size: 1.85rem;
+          font-weight: 100;
+          margin: 1.7rem 1rem;
         }
-
         .page-content {
           display: flex;
           justify-content: center;
@@ -76,6 +81,23 @@ import { BackstageFacadeService } from '../services/backstage-facade.service';
           padding: 1rem;
           flex: 0 1 clamp(480px, 70vw, 1400px);
           max-width: 100%;
+        }
+        .action-bar {
+          position: sticky;
+          top: 56px;
+          height: 56px;
+          z-index: 5;
+          display: flex;
+          flex-direction: row;
+          width: 100%;
+          background: var(--mat-sys-primary);
+          align-items: center;
+          a,
+          button {
+            color: var(--mat-sys-on-primary);
+            background: var(--mat-sys-primary);
+            margin: 0 12px;
+          }
         }
       }
     `,
@@ -86,6 +108,23 @@ export class BackstageListPage {
   protected readonly facade = inject(BackstageFacadeService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+
+  protected readonly lastRouteURL = computed(
+    () =>
+      this.router
+        .lastSuccessfulNavigation()
+        ?.previousNavigation?.extractedUrl.toString() ?? '/backstage'
+  );
+
+  protected readonly lastRouteName = computed(
+    () =>
+      this.router
+        .lastSuccessfulNavigation()
+        ?.previousNavigation?.extractedUrl.toString()
+        .split('/')[1]
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase()) || 'Backstage'
+  );
 
   onQueryChange(q: string) {
     this.facade.setQuery(q ?? '');
