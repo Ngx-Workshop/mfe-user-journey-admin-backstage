@@ -27,12 +27,32 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
       <mat-card-header>
         <div class="title-row">
           <div class="titles">
-            <div class="name">{{ service().repoName }}</div>
+            <div class="meta">
+              <div class="meta-row">
+                <mat-icon inline>update</mat-icon>
+                <span>
+                  Last sync:
+                  {{
+                    service().lastSyncAt
+                      ? (service().lastSyncAt | date : 'short')
+                      : 'Never'
+                  }}
+                </span>
+              </div>
+              @if (service().syncError) {
+              <div class="meta-row error">
+                <mat-icon inline>error</mat-icon>
+                <span>{{ service().syncError }}</span>
+              </div>
+              }
+            </div>
+            <div class="repo-name">{{ service().repoName }}</div>
             @if (service().description) {
             <div class="desc">{{ service().description }}</div>
             }
           </div>
-          <span
+          <div class="flex-spacer"></div>
+          <div
             class="status"
             [class.ok]="service().syncStatus === 'ok'"
             [class.failed]="service().syncStatus === 'failed'"
@@ -47,62 +67,37 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
               {{ statusIcon(service().syncStatus) }}
             </mat-icon>
             {{ service().syncStatus }}
-          </span>
+          </div>
         </div>
       </mat-card-header>
 
       <mat-card-content>
-        <div
-          class="chips"
-          *ngIf="service().topics.length; else noTopics"
-        >
+        @if(service().topics.length > 0) {
+        <div class="chips">
           <mat-chip-set>
             @for (topic of service().topics; track topic) {
             <mat-chip appearance="outlined">{{ topic }}</mat-chip>
             }
           </mat-chip-set>
         </div>
-        <ng-template #noTopics>
-          <div class="muted">No topics</div>
-        </ng-template>
+        } @else {
+        <mat-chip class="muted" appearance="outlined"
+          >No topics</mat-chip
+        >
 
-        <div class="meta">
-          <div class="meta-row">
-            <mat-icon inline>update</mat-icon>
-            <span>
-              Last sync:
-              {{
-                service().lastSyncAt
-                  ? (service().lastSyncAt | date : 'short')
-                  : 'Never'
-              }}
-            </span>
-          </div>
-          @if (service().syncError) {
-          <div class="meta-row error">
-            <mat-icon inline>error</mat-icon>
-            <span>{{ service().syncError }}</span>
-          </div>
-          }
-        </div>
+        }
       </mat-card-content>
 
       <mat-card-actions align="end">
         <button
-          mat-stroked-button
-          color="primary"
+          mat-button
           (click)="onView()"
           aria-label="View details"
         >
           <mat-icon>open_in_new</mat-icon>
           View
         </button>
-        <button
-          mat-flat-button
-          color="accent"
-          (click)="onRefresh()"
-          aria-label="Refresh"
-        >
+        <button mat-button (click)="onRefresh()" aria-label="Refresh">
           <mat-icon>refresh</mat-icon>
           Refresh
         </button>
@@ -114,6 +109,9 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
       .service-card {
         display: grid;
         gap: 0.5rem;
+
+        background-color: var(--mat-sys-surface-container-high);
+        transition: all 0.2s ease;
       }
       .title-row {
         display: flex;
@@ -126,15 +124,17 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
         gap: 0.25rem;
         min-width: 0;
       }
-      .name {
-        font-weight: 700;
-        font-size: 1.05rem;
+      .repo-name {
+        font-weight: 100;
+        font-size: 2rem;
         word-break: break-word;
       }
       .desc {
         color: var(--mat-sys-on-surface-variant);
       }
       .status {
+        position: absolute;
+        right: 1em;
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
@@ -173,7 +173,7 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
         margin-bottom: 0.5rem;
       }
       .muted {
-        color: var(--mat-sys-on-surface-variant);
+        color: red;
         font-size: 0.85rem;
       }
       .meta {

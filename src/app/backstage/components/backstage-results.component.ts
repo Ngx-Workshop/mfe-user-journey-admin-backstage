@@ -71,13 +71,16 @@ export type BackstageListViewState = {
   styles: [
     `
       .results {
-        min-height: 200px;
-        display: grid;
-        gap: 1rem;
+        background: var(--mat-sys-surface-container-low);
+        padding: 1.5rem;
+        border-radius: var(
+          --mat-card-elevated-container-shape,
+          var(--mat-sys-corner-medium)
+        );
       }
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(375px, 1fr));
         gap: 1rem;
       }
       .empty {
