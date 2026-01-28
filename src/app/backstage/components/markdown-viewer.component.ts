@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Input,
-  Output,
+  computed,
   inject,
+  input,
+  output,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,7 +20,6 @@ import { marked } from 'marked';
 
 @Component({
   selector: 'ngx-backstage-markdown-viewer',
-  standalone: true,
   imports: [
     CommonModule,
     MatButtonModule,
@@ -32,11 +31,11 @@ import { marked } from 'marked';
   template: `
     <div class="doc-header">
       <div class="title-row">
-        <div class="title">{{ title }}</div>
+        <div class="title">{{ title() }}</div>
         <div class="actions">
           <button
             mat-icon-button
-            [disabled]="!doc?.content"
+            [disabled]="!canCopy()"
             matTooltip="Copy raw markdown"
             (click)="copy()"
             aria-label="Copy markdown"
@@ -53,35 +52,38 @@ import { marked } from 'marked';
           </button>
         </div>
       </div>
-      <div class="meta" *ngIf="doc?.fetchedAt || doc?.sha">
-        <span *ngIf="doc?.sha">SHA {{ doc?.sha }}</span>
-        <span *ngIf="doc?.fetchedAt"
-          >Fetched {{ doc?.fetchedAt | date : 'short' }}</span
-        >
+      @if (docHasMeta()) {
+      <div class="meta">
+        @if (docSha()) {
+        <span>SHA {{ docSha() }}</span>
+        } @if (docFetchedAt()) {
+        <span>Fetched {{ docFetchedAt() | date : 'short' }}</span>
+        }
       </div>
+      }
     </div>
 
-    @if (loading) {
+    @if (loading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     } @else {
     <div class="body">
-      @if (error) {
+      @if (error()) {
       <div class="empty error">
         <mat-icon>error</mat-icon>
         <div>
-          <div class="title">{{ error }}</div>
-          @if(unauthorized) {
+          <div class="title">{{ error() }}</div>
+          @if(unauthorized()) {
           <div class="subtitle">Check your access and retry.</div>
           }
         </div>
       </div>
-      } @else if (!doc?.content) {
+      } @else if (!doc()?.content) {
       <div class="empty">
         <mat-icon>description</mat-icon>
-        <div class="title">{{ emptyLabel }}</div>
+        <div class="title">{{ emptyLabel() }}</div>
       </div>
       } @else {
-      <div class="markdown" [innerHTML]="renderedHtml"></div>
+      <div class="markdown" [innerHTML]="renderedHtml()"></div>
       }
     </div>
     }
@@ -122,23 +124,13 @@ import { marked } from 'marked';
         padding: 0.75rem;
         background: var(--mat-sys-surface-container-low, #fafafa);
       }
-      .markdown :is(h1, h2, h3, h4, h5, h6) {
-        margin: 0.6em 0 0.3em;
-      }
-      .markdown p {
-        margin: 0.4em 0;
-      }
-      .markdown pre {
-        padding: 0.5rem;
-        background: #0b1021;
-        color: #f8f8f2;
-        border-radius: 6px;
-        overflow: auto;
-      }
-      .markdown code:not(pre code) {
-        background: rgba(0, 0, 0, 0.05);
-        padding: 0.1rem 0.35rem;
-        border-radius: 4px;
+      :host ::ng-deep .markdown img,
+      :host ::ng-deep .markdown table img {
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: contain;
       }
       .empty {
         display: grid;
@@ -158,26 +150,33 @@ import { marked } from 'marked';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarkdownViewerComponent {
-  @Input() title = 'Document';
-  @Input() doc?: DocBlobDto | null;
-  @Input() loading = false;
-  @Input() error?: string;
-  @Input() unauthorized?: boolean;
-  @Input() emptyLabel = 'Not provided in repo';
-  @Output() reload = new EventEmitter<void>();
+  readonly title = input('Document');
+  readonly doc = input<DocBlobDto | null | undefined>(null);
+  readonly loading = input(false);
+  readonly error = input<string | undefined>();
+  readonly unauthorized = input<boolean | undefined>();
+  readonly emptyLabel = input('Not provided in repo');
+  readonly reload = output<void>();
 
   private readonly snackBar = inject(MatSnackBar);
 
-  get renderedHtml(): string {
-    return marked.parse(this.doc?.content ?? '', {
-      async: false,
-    }) as string;
-  }
+  readonly docContent = computed(() => this.doc()?.content ?? '');
+  readonly docSha = computed(() => this.doc()?.sha);
+  readonly docFetchedAt = computed(() => this.doc()?.fetchedAt);
+  readonly docHasMeta = computed(
+    () => !!(this.docSha() || this.docFetchedAt())
+  );
+  readonly canCopy = computed(() => this.docContent().length > 0);
+
+  readonly renderedHtml = computed(
+    () => marked.parse(this.docContent()) as string
+  );
 
   async copy() {
-    if (!this.doc?.content) return;
+    const content = this.docContent();
+    if (!content) return;
     try {
-      await navigator.clipboard.writeText(this.doc.content);
+      await navigator.clipboard.writeText(content);
       this.snackBar.open('Copied markdown', undefined, {
         duration: 1800,
       });
