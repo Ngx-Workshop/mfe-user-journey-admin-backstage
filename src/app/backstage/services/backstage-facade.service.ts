@@ -26,7 +26,7 @@ import {
 
 export type DocKind = 'readme' | 'openapi' | 'runbook' | 'metadata';
 
-type DocState = {
+export type DocState = {
   loading: boolean;
   data?: DocBlobDto | null;
   error?: string;
