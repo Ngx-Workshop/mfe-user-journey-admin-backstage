@@ -16,6 +16,7 @@ import {
 } from '../services/backstage-facade.service';
 import { DocViewerComponent } from './doc-viewer.component';
 import { MarkdownViewerComponent } from './markdown-viewer.component';
+import { OpenApiViewerComponent } from './openapi-viewer.component';
 
 const defaultDocStates: Record<DocKind, DocState> = {
   readme: { loading: false, data: null },
@@ -31,6 +32,7 @@ const defaultDocStates: Record<DocKind, DocState> = {
     MatTabsModule,
     MarkdownViewerComponent,
     DocViewerComponent,
+    OpenApiViewerComponent,
   ],
   template: `
     <mat-tab-group
@@ -52,18 +54,16 @@ const defaultDocStates: Record<DocKind, DocState> = {
         </section>
       </mat-tab>
       <mat-tab label="OpenAPI">
-        <section class="tab-content">
-          <ngx-backstage-doc-viewer
-            title="OpenAPI"
-            [doc]="docs().openapi.data"
-            [loading]="docs().openapi.loading"
-            [error]="docs().openapi.error"
-            [unauthorized]="docs().openapi.unauthorized"
-            (reload)="
-              reloadDoc.emit({ kind: 'openapi', refresh: true })
-            "
-          ></ngx-backstage-doc-viewer>
-        </section>
+        <ngx-backstage-openapi-viewer
+          title="OpenAPI"
+          [doc]="docs().openapi.data"
+          [loading]="docs().openapi.loading"
+          [error]="docs().openapi.error"
+          [unauthorized]="docs().openapi.unauthorized"
+          (reload)="
+            reloadDoc.emit({ kind: 'openapi', refresh: true })
+          "
+        ></ngx-backstage-openapi-viewer>
       </mat-tab>
       <mat-tab
         label="Runbook"
@@ -113,7 +113,7 @@ const defaultDocStates: Record<DocKind, DocState> = {
       ngx-backstage-markdown-viewer,
       ngx-backstage-doc-viewer {
         padding: 1rem;
-        flex: 0 1 clamp(480px, 70vw, 1400px);
+        flex: 0 1 clamp(480px, 750px, 1400px);
         max-width: 100%;
       }
 
