@@ -72,9 +72,6 @@ import { marked } from 'marked';
         <mat-icon>error</mat-icon>
         <div>
           <div class="title">{{ error() }}</div>
-          @if(unauthorized()) {
-          <div class="subtitle">Check your access and retry.</div>
-          }
         </div>
       </div>
       } @else if (!doc()?.content) {
@@ -127,7 +124,6 @@ import { marked } from 'marked';
       :host ::ng-deep .markdown img,
       :host ::ng-deep .markdown table img {
         max-width: 100%;
-        width: 100%;
         height: auto;
         display: block;
         object-fit: contain;

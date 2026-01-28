@@ -45,7 +45,7 @@ import {
         }}
       </h1>
       <ngx-backstage-status-badge
-        [status]="detailState().service!.syncStatus"
+        [status]="detailState().service?.syncStatus ?? 'failed'"
       ></ngx-backstage-status-badge>
     </ngx-particle-header>
 
@@ -134,12 +134,6 @@ export class BackstageDetailPage {
   private readonly snackBar = inject(MatSnackBar);
 
   private readonly repo = signal<string | null>(null);
-  private readonly tabOrder: DocKind[] = [
-    'readme',
-    'openapi',
-    'runbook',
-    'metadata',
-  ];
 
   readonly detailState = computed(() => this.facade.detailState());
   readonly docStates = computed(() => this.facade.docStates());
@@ -150,7 +144,6 @@ export class BackstageDetailPage {
       if (repo) {
         this.repo.set(repo);
         this.facade.loadDetail(repo);
-        this.ensureDoc('readme');
       }
     });
   }

@@ -1,7 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
-  DocBlobDto,
   ServiceDetailDto,
   ServiceSummaryDto,
   SyncRequestDto,
@@ -66,28 +65,19 @@ export class BackstageApiClient {
     );
   }
 
-  getReadme(repo: string, refresh?: boolean): Observable<DocBlobDto> {
+  getReadme(repo: string, refresh?: boolean): Observable<string> {
     return this.getDocBlob(repo, 'readme', refresh);
   }
 
-  getOpenApi(
-    repo: string,
-    refresh?: boolean
-  ): Observable<DocBlobDto> {
+  getOpenApi(repo: string, refresh?: boolean): Observable<string> {
     return this.getDocBlob(repo, 'openapi', refresh);
   }
 
-  getRunbook(
-    repo: string,
-    refresh?: boolean
-  ): Observable<DocBlobDto> {
+  getRunbook(repo: string, refresh?: boolean): Observable<string> {
     return this.getDocBlob(repo, 'runbook', refresh);
   }
 
-  getMetadata(
-    repo: string,
-    refresh?: boolean
-  ): Observable<DocBlobDto> {
+  getMetadata(repo: string, refresh?: boolean): Observable<string> {
     return this.getDocBlob(repo, 'metadata', refresh);
   }
 
@@ -95,14 +85,14 @@ export class BackstageApiClient {
     repo: string,
     kind: DocInclude,
     refresh?: boolean
-  ): Observable<DocBlobDto> {
+  ): Observable<string> {
     let params = new HttpParams();
     params = params.set('refresh', String(Boolean(refresh)));
-    return this.http.get<DocBlobDto>(
+    return this.http.get(
       this.buildUrl(
         `/backstage/services/${encodeURIComponent(repo)}/${kind}`
       ),
-      { params }
+      { params, responseType: 'text' }
     );
   }
 

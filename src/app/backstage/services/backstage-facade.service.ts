@@ -229,13 +229,6 @@ export class BackstageFacadeService {
           ...docs,
           [kind]: { loading: false, data: blob },
         }));
-        this.detailState.update((state) => {
-          if (!state.service) return state;
-          const updated = { ...state.service } as any;
-          if (kind === 'metadata') updated.serviceMetadata = blob;
-          else updated[kind] = blob;
-          return { ...state, service: updated };
-        });
       },
       error: (err) => {
         if (this.activeRepo() !== repo) return;
