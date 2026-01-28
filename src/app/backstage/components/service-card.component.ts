@@ -9,8 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
+import { StatusBadgeComponent } from './status-badge.component';
 
 @Component({
   selector: 'ngx-backstage-service-card',
@@ -20,7 +20,7 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
     MatChipsModule,
     MatButtonModule,
     MatIconModule,
-    MatTooltipModule,
+    StatusBadgeComponent,
   ],
   template: `
     <mat-card class="service-card">
@@ -52,22 +52,9 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
             }
           </div>
           <div class="flex-spacer"></div>
-          <div
-            class="status"
-            [class.ok]="service().syncStatus === 'ok'"
-            [class.failed]="service().syncStatus === 'failed'"
-            [class.partial]="service().syncStatus === 'partial'"
-            [class.rate_limited]="
-              service().syncStatus === 'rate_limited'
-            "
-            [class.idle]="service().syncStatus === 'idle'"
-            [matTooltip]="statusTooltip(service().syncStatus)"
-          >
-            <mat-icon inline class="status-icon">
-              {{ statusIcon(service().syncStatus) }}
-            </mat-icon>
-            {{ service().syncStatus }}
-          </div>
+          <ngx-backstage-status-badge
+            [status]="service().syncStatus"
+          ></ngx-backstage-status-badge>
         </div>
       </mat-card-header>
 
@@ -136,43 +123,6 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
       .desc {
         color: var(--mat-sys-on-surface-variant);
       }
-      .status {
-        position: absolute;
-        right: 1em;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 999px;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        font-weight: 700;
-      }
-      .status.ok {
-        background: #e8f5e9;
-        color: #1b5e20;
-      }
-      .status.failed {
-        background: #ffebee;
-        color: #b71c1c;
-      }
-      .status.partial {
-        background: #fff8e1;
-        color: #ff6f00;
-      }
-      .status.rate_limited {
-        background: #e3f2fd;
-        color: #0d47a1;
-      }
-      .status.idle {
-        background: #eceff1;
-        color: #37474f;
-      }
-      .status .status-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-      }
       .chips {
         margin-bottom: 0.5rem;
       }
@@ -205,36 +155,6 @@ export class ServiceCardComponent {
   readonly service = input.required<ServiceSummaryDto>();
   readonly view = output<string>();
   readonly refresh = output<string>();
-
-  statusIcon(status: ServiceSummaryDto['syncStatus']): string {
-    switch (status) {
-      case 'ok':
-        return 'check_circle';
-      case 'partial':
-        return 'pending';
-      case 'failed':
-        return 'error';
-      case 'rate_limited':
-        return 'schedule';
-      default:
-        return 'more_horiz';
-    }
-  }
-
-  statusTooltip(status: ServiceSummaryDto['syncStatus']): string {
-    switch (status) {
-      case 'ok':
-        return 'Synced';
-      case 'partial':
-        return 'Partial sync';
-      case 'failed':
-        return 'Sync failed';
-      case 'rate_limited':
-        return 'Rate limited';
-      default:
-        return 'Idle';
-    }
-  }
 
   onView() {
     this.view.emit(this.service().repoName);

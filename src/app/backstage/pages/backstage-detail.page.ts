@@ -17,6 +17,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgxParticleHeader } from '@tmdjr/ngx-shared-headers';
 import { BackstageDetailErrorComponent } from '../components/backstage-detail-error.component';
 import { BackstageDetailTabsComponent } from '../components/backstage-detail-tabs.component';
+import { StatusBadgeComponent } from '../components/status-badge.component';
 import {
   BackstageFacadeService,
   type DocKind,
@@ -33,12 +34,19 @@ import {
     BackstageDetailTabsComponent,
     BackstageDetailErrorComponent,
     NgxParticleHeader,
+    StatusBadgeComponent,
   ],
   template: `
     <ngx-particle-header class="header">
       <h1>
-        {{ detailState().service?.repoName | uppercase }}
+        {{
+          detailState().service?.repoName?.replace('-', ' ')
+            | titlecase
+        }}
       </h1>
+      <ngx-backstage-status-badge
+        [status]="detailState().service!.syncStatus"
+      ></ngx-backstage-status-badge>
     </ngx-particle-header>
 
     <div class="action-bar">
