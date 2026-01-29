@@ -523,6 +523,7 @@ type ResponseEntry = {
         cursor: pointer;
         list-style: none;
         font-weight: 600;
+        margin: 1rem 0;
       }
       .tag-group summary::-webkit-details-marker {
         display: none;
