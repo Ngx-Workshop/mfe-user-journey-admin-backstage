@@ -176,20 +176,7 @@ type ResponseEntry = {
   ],
   template: `
     <div class="doc-header">
-      <div class="title-row">
-        <div class="title">{{ title() }}</div>
-        <div class="actions">
-          <button
-            mat-stroked-button
-            type="button"
-            (click)="reload.emit()"
-            aria-label="Reload OpenAPI document"
-          >
-            <mat-icon>refresh</mat-icon>
-            Reload
-          </button>
-        </div>
-      </div>
+      <div class="title">{{ title() }}</div>
       @if (infoTitle()) {
       <div class="meta">
         <span>{{ infoTitle() }}</span>
@@ -480,15 +467,7 @@ type ResponseEntry = {
         display: block;
       }
       .doc-header {
-        display: grid;
-        gap: 0.25rem;
-        margin-bottom: 0.5rem;
-      }
-      .title-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
+        padding: 24px;
       }
       .title {
         font-weight: 700;

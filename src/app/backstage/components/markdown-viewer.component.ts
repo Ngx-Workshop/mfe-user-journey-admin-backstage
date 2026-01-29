@@ -80,7 +80,10 @@ import { marked } from 'marked';
         <div class="title">{{ emptyLabel() }}</div>
       </div>
       } @else {
-      <div class="markdown" [innerHTML]="renderedHtml()"></div>
+      <div
+        class="markdown ngx-editor-js2-block"
+        [innerHTML]="renderedHtml()"
+      ></div>
       }
     </div>
     }
