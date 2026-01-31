@@ -1,85 +1,156 @@
-# mfe-user-journey-admin-backstage
+# MFE User Journey - Admin - Backstage
 
-A user-journey micro frontend built with Angular and Module Federation.
+<img src="https://github.com/Ngx-Workshop/.github/blob/main/readme-assets/angular-gradient-wordmark.gif?raw=true" height="132" alt="Angular Logo" /> <img src="https://github.com/Ngx-Workshop/.github/blob/main/readme-assets/module-federation-logo.svg?raw=true" height="132" alt="Angular Logo" />
 
-## Overview
+Angular micro-frontend (remote) for the **Admin Backstage** user journey in the NGX Workshop ecosystem.
 
-This micro frontend now ships the Backstage admin journey:
+It provides:
 
-- `/backstage` — catalog list with search, sync-all, and per-service refresh.
-- `/backstage/:repo` — detail view with README, OpenAPI, optional runbook and metadata, refresh + open-repo.
-- API client + facade wired to `service-backstage` using `@tmdjr/backstage-contracts` types.
+- A Backstage services catalog list with search + refresh + “sync all”.
+- A service detail view with tabs for README, OpenAPI, optional runbook, and optional metadata.
+- A lightweight OpenAPI explorer (operation search + schema viewer).
 
-## Getting Started
+## Tech stack
+
+- Angular 21 (standalone, built-in control flow, signals)
+- Zoneless change detection + `OnPush` components
+- Module Federation via `@angular-architects/module-federation`
+- Angular Material UI
+- Typed DTOs from `@tmdjr/backstage-contracts`
+
+## Getting started
 
 ### Prerequisites
 
-- Node.js (v20.19.0 or higher)
-- npm (v8.0.0 or higher)
+- Node.js 20+
+- npm 8+
 
-### Installation
+### Install
 
 ```bash
 npm install
-cp public/env.example.js public/env.js # then update the URL below
 ```
 
-### Development
+### Run locally
 
-To start the development server:
+This remote is configured to serve on `http://localhost:4201`.
+
+Option A (recommended): Angular dev server
+
+```bash
+npm start
+```
+
+Option B: serve the built bundle (closer to how a host app consumes the remote)
 
 ```bash
 npm run dev:bundle
 ```
 
-This will:
+Notes:
 
-- Start the webpack build in watch mode
-- Serve the bundled application on http://localhost:4201
-- Enable CORS for cross-origin requests
+- `npm run dev:bundle` runs the build watcher + a static server on port `4201`.
+- `src/index.html` loads `/env.js` for runtime configuration. If your environment doesn’t provide it, either supply an empty `public/env.js` file or remove the script tag; the UI itself calls a relative API (see “Backend/API”).
 
-### Available Scripts
+### Tests
 
-- `npm run dev:bundle` - Start development server with watch mode
-- `npm run build` - Build the application for production
-- `npm run watch` - Build in watch mode only
-- `npm run serve:bundle` - Serve the built application
-- `npm test` - Run unit tests
+```bash
+npm test
+```
 
-## Architecture
+## Module Federation (how hosts consume this remote)
 
-This micro frontend uses:
+The remote entry is served as:
 
-- **Angular 20+** - Frontend framework
-- **Module Federation** - For micro frontend architecture
-- **Webpack** - Module bundler and build tool
-- **TypeScript** - Type-safe JavaScript development
+- `http://localhost:4201/remoteEntry.js`
 
-## Module Federation Configuration
+Exposes (see `webpack.config.js`):
 
-The micro frontend is exposed via Module Federation and can be consumed by host applications. Check the `webpack.config.js` file for exposed modules and configuration.
+- `./Component` → `src/app/app.ts` (default export of the root component)
+- `./Routes` → `src/app/app.routes.ts` (Angular `Route[]`)
 
-## Development Guidelines
+In a host app, you typically wire it up as a remote route. Example (host-side):
 
-1. Follow the established coding standards
-2. Write unit tests for new features
-3. Use TypeScript for type safety
-4. Follow Angular best practices
-5. Keep components focused and reusable
+```ts
+import { loadRemoteModule } from '@angular-architects/module-federation';
 
-## Deployment
+export const routes = [
+  {
+    path: 'backstage',
+    loadChildren: () =>
+      loadRemoteModule({
+        type: 'module',
+        remoteEntry: 'http://localhost:4201/remoteEntry.js',
+        exposedModule: './Routes',
+      }).then((m) => m.Routes),
+  },
+];
+```
 
-The application is automatically deployed via GitHub Actions when changes are pushed to the main branch.
+## Backend/API
+
+This MFE calls the Backstage API via a **relative** base URL:
+
+- `/api/backstage/…` (see `src/app/backstage/services/backstage-api-client.service.ts`)
+
+That means the **host app / gateway** must route `/api/backstage` to the Backstage service.
+
+Key calls:
+
+- `GET /api/backstage/backstage/services` (list)
+- `GET /api/backstage/backstage/services/:repo` (detail)
+- `POST /api/backstage/backstage/sync` (sync all)
+- `GET /api/backstage/backstage/services/:repo/{readme|openapi|runbook|metadata}` (doc blobs)
+
+## Architecture overview
+
+### Runtime entrypoints
+
+- `src/main.ts` → dynamic import of `src/bootstrap.ts`
+- `src/bootstrap.ts` → `bootstrapApplication(App, appConfig)`
+- `src/app/app.config.ts` → sets up router, HttpClient, animations, Reactive Forms, and **zoneless** change detection
+
+### Routing
+
+The remote ships its own routes in `src/app/app.routes.ts`:
+
+- `/backstage` → list page
+- `/backstage/:repo` → detail page
+
+These are the routes hosts usually mount under a shell route segment.
+
+### Feature layout
+
+Core Backstage feature code lives under `src/app/backstage/`:
+
+- `pages/`
+  - `backstage-list.page.ts`: list + search + sync all
+  - `backstage-detail.page.ts`: detail header + tabbed docs
+- `services/`
+  - `backstage-api-client.service.ts`: HTTP client (relative `/api/backstage/`)
+  - `backstage-facade.service.ts`: state + orchestration (signals + RxJS)
+- `components/`
+  - `markdown-viewer.component.ts`: README/runbook rendering (via `marked`)
+  - `openapi-viewer.component.ts`: OpenAPI explorer (operation search + schema)
+  - `schema-tree.component.ts`: schema visualization
+
+### State management (signals + RxJS)
+
+The pattern used is:
+
+- **Signals** for UI state (`listState`, `detailState`, `docStates`, `search`, …)
+- **RxJS streams** for debounced search and list reloads
+- “Docs” are lazy-loaded: switching tabs triggers a fetch only if the doc content is missing
+
+## Scripts
+
+- `npm start`: run dev server on `:4201`
+- `npm run build`: production build to `dist/mfe-user-journey-admin-backstage`
+- `npm run watch`: dev build in watch mode
+- `npm run serve:bundle`: serve `dist/…` on `:4201` (CORS enabled)
+- `npm run dev:bundle`: `watch` + `serve:bundle`
+- `npm run run:all`: launch `mf-dev-server` (useful when working with multiple MFEs locally)
 
 ## Repository
 
-- **GitHub**: https://github.com/Ngx-Workshop/mfe-user-journey-admin-backstage
-- **Type**: user-journey MFE
-
-## Support
-
-For questions or issues, please refer to the NGX Workshop documentation or create an issue in the repository.
-
----
-
-Generated on Sat Jan 24 21:04:40 EST 2026 using the NGX Workshop MFE creation script.
+- https://github.com/Ngx-Workshop/mfe-user-journey-admin-backstage
