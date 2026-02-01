@@ -26,36 +26,34 @@ import { StatusBadgeComponent } from './status-badge.component';
     <mat-card class="service-card">
       <mat-card-header>
         <div class="title-row">
-          <div class="titles">
-            <div class="meta">
-              <div class="meta-row">
-                <mat-icon inline>update</mat-icon>
-                <span>
-                  Last sync:
-                  {{
-                    service().lastSyncAt
-                      ? (service().lastSyncAt | date : 'short')
-                      : 'Never'
-                  }}
-                </span>
-              </div>
-              @if (service().syncError) {
-              <div class="meta-row error">
-                <mat-icon inline>error</mat-icon>
-                <span>{{ service().syncError }}</span>
-              </div>
-              }
+          <div class="meta">
+            <div class="meta-row">
+              <mat-icon inline>update</mat-icon>
+              <span>
+                Last sync:
+                {{
+                  service().lastSyncAt
+                    ? (service().lastSyncAt | date : 'short')
+                    : 'Never'
+                }}
+              </span>
             </div>
-            <div class="repo-name">{{ service().repoName }}</div>
-            @if (service().description) {
-            <div class="desc">{{ service().description }}</div>
+            @if (service().syncError) {
+            <div class="meta-row error">
+              <mat-icon inline>error</mat-icon>
+              <span>{{ service().syncError }}</span>
+            </div>
             }
           </div>
-          <div class="flex-spacer"></div>
-          <ngx-backstage-status-badge
-            [status]="service().syncStatus"
-          ></ngx-backstage-status-badge>
+          <div class="repo-name">{{ service().repoName }}</div>
+          @if (service().description) {
+          <div class="desc">{{ service().description }}</div>
+          }
         </div>
+        <div class="flex-spacer"></div>
+        <ngx-backstage-status-badge
+          [status]="service().syncStatus"
+        ></ngx-backstage-status-badge>
       </mat-card-header>
 
       <mat-card-content>
@@ -102,17 +100,6 @@ import { StatusBadgeComponent } from './status-badge.component';
         height: 100%;
         background-color: var(--mat-sys-surface-container-high);
         transition: all 0.2s ease;
-      }
-      .title-row {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 0.75rem;
-      }
-      .titles {
-        display: grid;
-        gap: 0.25rem;
-        min-width: 0;
       }
       .repo-name {
         font-weight: 100;

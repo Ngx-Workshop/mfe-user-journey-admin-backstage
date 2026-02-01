@@ -30,9 +30,6 @@ import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
   `,
   styles: [
     `
-      :host {
-        display: contents;
-      }
       .status {
         display: inline-flex;
         align-items: center;

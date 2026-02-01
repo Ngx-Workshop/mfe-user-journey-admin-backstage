@@ -119,17 +119,61 @@ import { marked } from 'marked';
         font-size: 0.9rem;
       }
       .body {
-        border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
-        border-radius: 8px;
-        padding: 0.75rem;
-        background: var(--mat-sys-surface-container-low, #fafafa);
+        border-radius: 16px;
+        padding: 2rem;
+        background: var(--mat-sys-surface-container-high, #fafafa);
       }
-      :host ::ng-deep .markdown img,
-      :host ::ng-deep .markdown table img {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        object-fit: contain;
+
+      :host ::ng-deep .markdown {
+        font: var(--mat-sys-body-large);
+        h1 {
+          font: var(--mat-sys-display-large);
+        }
+        h2 {
+          font: var(--mat-sys-display-medium);
+        }
+        h3 {
+          font: var(--mat-sys-display-small);
+        }
+        h4 {
+          font: var(--mat-sys-headline-large);
+        }
+        h5 {
+          font: var(--mat-sys-headline-medium);
+        }
+        h6 {
+          font: var(--mat-sys-headline-small);
+        }
+
+        pre {
+          color: var(--mat-sys-on-secondary-container);
+          background: var(--mat-sys-secondary-container);
+          padding: 1rem;
+          border-radius: 16px;
+          overflow: auto;
+          font-family: 'Fira Code', monospace;
+          code {
+            font-size: 1rem;
+          }
+        }
+        code {
+          background: var(--mat-sys-secondary-container);
+          padding: 0.5rem;
+          border-radius: 16px;
+          font-family: 'Fira Code', monospace;
+          font-size: 0.8rem;
+        }
+
+        li {
+          margin: 12px 0px;
+        }
+
+        table img {
+          max-width: 100%;
+          height: auto;
+          display: block;
+          object-fit: contain;
+        }
       }
       .empty {
         display: grid;

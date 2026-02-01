@@ -112,8 +112,8 @@ const defaultDocStates: Record<DocKind, DocState> = {
 
       ngx-backstage-markdown-viewer,
       ngx-backstage-doc-viewer {
-        padding: 1rem;
-        flex: 0 1 clamp(480px, 750px, 1400px);
+        margin: 3rem 0;
+        flex: 0 1 clamp(480px, 900px, 1400px);
         max-width: 100%;
       }
 
