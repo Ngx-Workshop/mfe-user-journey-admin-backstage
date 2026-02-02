@@ -17,7 +17,7 @@ export type DocInclude =
 @Injectable({ providedIn: 'root' })
 export class BackstageApiClient {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = '/api/backstage/';
+  private readonly baseUrl = '/api/';
 
   listServices(params?: {
     q?: string;
