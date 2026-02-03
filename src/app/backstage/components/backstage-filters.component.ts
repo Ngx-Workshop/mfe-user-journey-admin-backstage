@@ -10,14 +10,40 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
+interface RepoNamePrefixesSearchParam {
+  value: string;
+  viewValue: string;
+}
+
+const repoNamePrefixes: RepoNamePrefixesSearchParam[] = [
+  {
+    value: 'service-',
+    viewValue: 'Services',
+  },
+  {
+    value: 'mfe-shell',
+    viewValue: 'MFE Shell',
+  },
+  {
+    value: 'mfe-structural',
+    viewValue: 'MFE Structural',
+  },
+  {
+    value: 'mfe-user-journey',
+    viewValue: 'MFE User Journey',
+  },
+];
 
 @Component({
   selector: 'ngx-backstage-filters',
   imports: [
     CommonModule,
     MatFormFieldModule,
+    MatSelectModule,
     MatInputModule,
     MatIconModule,
     MatTooltipModule,
@@ -28,7 +54,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     <div class="filters">
       <div class="filter-row header">
         <h3>Filters</h3>
-        <button matButton (click)="onFilterChange()">
+        <button matButton (click)="clearAllFilters()">
           <mat-icon>clear_all</mat-icon> Clear All
         </button>
       </div>
@@ -61,6 +87,23 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         >
           Include docs in list
         </mat-slide-toggle>
+      </div>
+
+      <div class="filter-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Favorite food</mat-label>
+          <mat-select
+            [(value)]="repoNamePrefixesSelectValue"
+            (valueChange)="onQueryChange($event)"
+          >
+            @for (repoNamePrefix of repoNamePrefixes; track
+            repoNamePrefix.value) {
+            <mat-option [value]="repoNamePrefix.value">{{
+              repoNamePrefix.viewValue
+            }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
       </div>
     </div>
   `,
@@ -128,7 +171,14 @@ export class BackstageFiltersComponent {
 
   readonly hasQuery = computed(() => !!this.searchTerm()?.trim());
 
+  repoNamePrefixes = repoNamePrefixes;
+
+  repoNamePrefixesSelectValue: string | null = null;
+
   onQueryChange(value: string) {
+    !this.repoNamePrefixes.some((prefix) => value === prefix.value)
+      ? (this.repoNamePrefixesSelectValue = null)
+      : void 0;
     this.queryChange.emit(value ?? '');
   }
 
@@ -136,5 +186,8 @@ export class BackstageFiltersComponent {
     this.includeDocsChange.emit(!!checked);
   }
 
-  onFilterChange() {}
+  clearAllFilters() {
+    this.onQueryChange('');
+    this.onIncludeDocsChange(false);
+  }
 }
