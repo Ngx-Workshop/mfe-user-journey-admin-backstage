@@ -137,7 +137,7 @@ export class BackstageListPage {
 
   onView(repo: string) {
     console.log('Navigating to repo:', repo);
-    this.router.navigate(['/backstage/backstage', repo]);
+    this.router.navigate(['/backstage/details', repo]);
   }
 
   onRefresh(repo: string) {

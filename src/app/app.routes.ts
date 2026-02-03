@@ -3,14 +3,14 @@ import { BackstageDetailPage } from './backstage/pages/backstage-detail.page';
 import { BackstageListPage } from './backstage/pages/backstage-list.page';
 
 export const Routes: Route[] = [
-  { path: '', redirectTo: 'backstage', pathMatch: 'full' },
+  { path: '', redirectTo: 'list', pathMatch: 'full' },
   {
-    path: 'backstage',
+    path: 'list',
     component: BackstageListPage,
   },
   {
-    path: 'backstage/:repo',
+    path: 'details/:repo',
     component: BackstageDetailPage,
   },
-  { path: '**', redirectTo: 'backstage' },
+  { path: '**', redirectTo: 'list' },
 ];
