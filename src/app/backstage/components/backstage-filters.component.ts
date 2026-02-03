@@ -90,8 +90,11 @@ const repoNamePrefixes: RepoNamePrefixesSearchParam[] = [
       </div>
 
       <div class="filter-row">
-        <mat-form-field appearance="outline">
-          <mat-label>Favorite food</mat-label>
+        <mat-form-field
+          appearance="outline"
+          class="repo-prefix-select"
+        >
+          <mat-label>Quick Search with Repo Prefixes</mat-label>
           <mat-select
             [(value)]="repoNamePrefixesSelectValue"
             (valueChange)="onQueryChange($event)"
@@ -126,6 +129,10 @@ const repoNamePrefixes: RepoNamePrefixesSearchParam[] = [
       .search-bar {
         width: 100%;
         max-width: 600px;
+      }
+      .repo-prefix-select {
+        width: 100%;
+        max-width: 300px;
       }
 
       .filter-row {
