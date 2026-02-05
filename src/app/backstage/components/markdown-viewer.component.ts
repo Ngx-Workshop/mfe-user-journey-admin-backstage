@@ -144,6 +144,18 @@ import { marked } from 'marked';
         h6 {
           font: var(--mat-sys-headline-small);
         }
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+          margin: 0;
+          sup {
+            font-weight: 100;
+            font-size: 3.5rem;
+          }
+        }
 
         pre {
           color: var(--mat-sys-on-secondary-container);

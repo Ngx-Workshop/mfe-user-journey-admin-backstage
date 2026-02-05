@@ -45,10 +45,13 @@ import { StatusBadgeComponent } from './status-badge.component';
             </div>
             }
           </div>
-          <div class="repo-name">{{ service().repoName }}</div>
-          @if (service().description) {
-          <div class="desc">{{ service().description }}</div>
-          }
+
+          <div class="repo-desc">
+            {{ service().description ?? 'MISSING DESCRIPTION' }}
+          </div>
+          <div class="repo-name">
+            <pre><code>{{ service().repoName }}</code></pre>
+          </div>
         </div>
         <div class="flex-spacer"></div>
         <ngx-backstage-status-badge
@@ -102,13 +105,23 @@ import { StatusBadgeComponent } from './status-badge.component';
         transition: all 0.2s ease;
       }
       .repo-name {
+        padding: 0.6rem 0;
+        code {
+          font-size: 0.8rem;
+          padding: 0.7rem;
+          border-radius: var(
+            --mat-card-elevated-container-shape,
+            var(--mat-sys-corner-medium)
+          );
+          background-color: var(--mat-sys-surface-container-highest);
+        }
+      }
+
+      .repo-desc {
         font-weight: 100;
         font-size: 2rem;
         word-break: break-word;
         padding: 0.5em 0 0;
-      }
-      .desc {
-        color: var(--mat-sys-on-surface-variant);
       }
       .chips {
         margin-bottom: 0.5rem;
