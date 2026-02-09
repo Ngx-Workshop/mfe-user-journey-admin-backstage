@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   input,
   output,
 } from '@angular/core';
@@ -38,12 +39,22 @@ import { StatusBadgeComponent } from './status-badge.component';
                 }}
               </span>
             </div>
-            @if (service().syncError) {
+            @if (service().syncStatus !== 'ok' && service().syncError)
+            {
             <div class="meta-row error">
               <mat-icon inline>error</mat-icon>
               <span>{{ service().syncError }}</span>
             </div>
             }
+
+            <div class="meta-row">
+              @for(lang of service().languages | keyvalue; track lang)
+              {
+              <i
+                [class]="'devicon-' + lang.key + '-plain colored'"
+              ></i>
+              }
+            </div>
           </div>
 
           <div class="repo-desc">
@@ -155,6 +166,15 @@ export class ServiceCardComponent {
   readonly service = input.required<ServiceSummaryDto>();
   readonly view = output<string>();
   readonly refresh = output<string>();
+
+  protected readonly viewModel = computed(() => ({
+    lastSyncAt: this.service().lastSyncAt,
+    syncError: this.service().syncError,
+    languages: this.service().languages,
+    description: this.service().description,
+    repoName: this.service().repoName,
+    topics: this.service().topics,
+  }));
 
   onView() {
     this.view.emit(this.service().repoName);
