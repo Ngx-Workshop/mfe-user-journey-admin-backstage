@@ -48,10 +48,8 @@ import { StatusBadgeComponent } from './status-badge.component';
             }
 
             <div class="meta-row">
-              @for(lang of vm.languages | keyvalue; track lang) {
-              <i
-                [class]="'devicon-' + lang.key + '-plain colored'"
-              ></i>
+              @for(lang of vm.deviconLanguages; track lang) {
+              <i [class]="lang"></i>
               }
             </div>
           </div>
@@ -108,55 +106,67 @@ import { StatusBadgeComponent } from './status-badge.component';
   `,
   styles: [
     `
-      .service-card {
-        display: grid;
-        gap: 0.5rem;
-        height: 100%;
-        background-color: var(--mat-sys-surface-container-high);
-        transition: all 0.2s ease;
-      }
-      .repo-name {
-        padding: 0.6rem 0;
-        code {
-          font-size: 0.8rem;
-          padding: 0.7rem;
-          border-radius: var(
-            --mat-card-elevated-container-shape,
-            var(--mat-sys-corner-medium)
-          );
-          background-color: var(--mat-sys-surface-container-highest);
+      :host {
+        .service-card {
+          display: grid;
+          gap: 0.5rem;
+          height: 100%;
+          background-color: var(--mat-sys-surface-container-high);
+          transition: all 0.2s ease;
         }
-      }
+        .repo-name {
+          padding: 0.6rem 0;
+          code {
+            font-size: 0.8rem;
+            padding: 0.7rem;
+            border-radius: var(
+              --mat-card-elevated-container-shape,
+              var(--mat-sys-corner-medium)
+            );
+            background-color: var(
+              --mat-sys-surface-container-highest
+            );
+          }
+        }
 
-      .repo-desc {
-        font-weight: 100;
-        font-size: 2rem;
-        word-break: break-word;
-        padding: 0.5em 0 0;
-      }
-      .chips {
-        margin-bottom: 0.5rem;
-      }
-      .muted {
-        color: red;
-        font-size: 0.85rem;
-      }
-      .meta {
-        display: grid;
-        gap: 0.25rem;
-        font-size: 0.9rem;
-      }
-      .meta-row {
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-        color: var(--mat-sys-on-surface-variant);
-      }
-      .meta-row.error {
-        color: #b71c1c;
-      }
-      mat-card-actions {
-        padding: 0 1rem 1rem;
+        .repo-desc {
+          font-weight: 100;
+          font-size: 2rem;
+          word-break: break-word;
+          padding: 0.5em 0 0;
+        }
+        .chips {
+          margin-bottom: 0.5rem;
+        }
+        .muted {
+          color: red;
+          font-size: 0.85rem;
+        }
+        .meta {
+          display: grid;
+          gap: 0.25rem;
+          font-size: 0.9rem;
+        }
+        .meta-row {
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+          color: var(--mat-sys-on-surface-variant);
+        }
+        .meta-row.error {
+          color: #b71c1c;
+        }
+        mat-card-actions {
+          padding: 0 1rem 1rem;
+        }
+        i[class*='devicon-'] {
+          font-size: 1.5rem;
+          margin: 0.25rem;
+
+          &.dark-background {
+            background-color: rgba(0, 0, 0, 0.8);
+          }
+        }
       }
     `,
   ],
@@ -173,6 +183,7 @@ export class ServiceCardComponent {
       description: dto.description,
       languages: dto.languages,
       lastSyncAt: dto.lastSyncAt,
+      deviconLanguages: dto.deviconLanguages,
       repoName: dto.repoName,
       syncError: dto.syncError,
       syncStatus: dto.syncStatus,
