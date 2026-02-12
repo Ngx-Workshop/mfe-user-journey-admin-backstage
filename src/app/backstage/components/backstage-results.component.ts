@@ -37,7 +37,7 @@ export type BackstageListViewState = {
         @for (svc of state().items; track svc.repoName) {
         <ngx-backstage-service-card
           role="listitem"
-          [service]="svc"
+          [serviceSummaryDto]="svc"
           (view)="onView($event)"
           (refresh)="onRefresh($event)"
         ></ngx-backstage-service-card>

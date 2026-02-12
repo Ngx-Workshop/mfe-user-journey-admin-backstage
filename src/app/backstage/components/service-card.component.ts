@@ -25,6 +25,7 @@ import { StatusBadgeComponent } from './status-badge.component';
   ],
   template: `
     <mat-card class="service-card">
+      @if(viewModel(); as vm) {
       <mat-card-header>
         <div class="title-row">
           <div class="meta">
@@ -33,23 +34,21 @@ import { StatusBadgeComponent } from './status-badge.component';
               <span>
                 Last sync:
                 {{
-                  service().lastSyncAt
-                    ? (service().lastSyncAt | date : 'short')
+                  vm.lastSyncAt
+                    ? (vm.lastSyncAt | date : 'short')
                     : 'Never'
                 }}
               </span>
             </div>
-            @if (service().syncStatus !== 'ok' && service().syncError)
-            {
+            @if (vm.syncStatus !== 'ok' && vm.syncError) {
             <div class="meta-row error">
               <mat-icon inline>error</mat-icon>
-              <span>{{ service().syncError }}</span>
+              <span>{{ vm.syncError }}</span>
             </div>
             }
 
             <div class="meta-row">
-              @for(lang of service().languages | keyvalue; track lang)
-              {
+              @for(lang of vm.languages | keyvalue; track lang) {
               <i
                 [class]="'devicon-' + lang.key + '-plain colored'"
               ></i>
@@ -58,23 +57,23 @@ import { StatusBadgeComponent } from './status-badge.component';
           </div>
 
           <div class="repo-desc">
-            {{ service().description ?? 'MISSING DESCRIPTION' }}
+            {{ vm.description ?? 'MISSING DESCRIPTION' }}
           </div>
           <div class="repo-name">
-            <pre><code>{{ service().repoName }}</code></pre>
+            <pre><code>{{ vm.repoName }}</code></pre>
           </div>
         </div>
         <div class="flex-spacer"></div>
         <ngx-backstage-status-badge
-          [status]="service().syncStatus"
+          [status]="vm.syncStatus"
         ></ngx-backstage-status-badge>
       </mat-card-header>
 
       <mat-card-content>
-        @if(service().topics.length > 0) {
+        @if(vm.topics.length > 0) {
         <div class="chips">
           <mat-chip-set>
-            @for (topic of service().topics; track topic) {
+            @for (topic of vm.topics; track topic) {
             <mat-chip appearance="outlined">
               <i [class]="'angular'"></i>
               {{ topic }}</mat-chip
@@ -104,6 +103,7 @@ import { StatusBadgeComponent } from './status-badge.component';
           Refresh
         </button>
       </mat-card-actions>
+      }
     </mat-card>
   `,
   styles: [
@@ -163,24 +163,28 @@ import { StatusBadgeComponent } from './status-badge.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceCardComponent {
-  readonly service = input.required<ServiceSummaryDto>();
   readonly view = output<string>();
   readonly refresh = output<string>();
 
-  protected readonly viewModel = computed(() => ({
-    lastSyncAt: this.service().lastSyncAt,
-    syncError: this.service().syncError,
-    languages: this.service().languages,
-    description: this.service().description,
-    repoName: this.service().repoName,
-    topics: this.service().topics,
-  }));
+  readonly serviceSummaryDto = input.required<ServiceSummaryDto>();
+  protected readonly viewModel = computed(() => {
+    const dto = this.serviceSummaryDto();
+    return {
+      description: dto.description,
+      languages: dto.languages,
+      lastSyncAt: dto.lastSyncAt,
+      repoName: dto.repoName,
+      syncError: dto.syncError,
+      syncStatus: dto.syncStatus,
+      topics: dto.topics,
+    };
+  });
 
   onView() {
-    this.view.emit(this.service().repoName);
+    this.view.emit(this.viewModel().repoName);
   }
 
   onRefresh() {
-    this.refresh.emit(this.service().repoName);
+    this.refresh.emit(this.viewModel().repoName);
   }
 }
