@@ -115,6 +115,7 @@ const defaultDocStates: Record<DocKind, DocState> = {
         margin: 3rem 0;
         flex: 0 1 clamp(480px, 900px, 1400px);
         max-width: 100%;
+        min-width: 0; /* <-- key for flex + long content */
       }
 
       :host ::ng-deep .tabs .mat-mdc-tab-header {
