@@ -74,7 +74,9 @@ import {
               : 'Never synced'
           }}
         </span>
-        @if (detailState().service?.syncError) {
+
+        @if (detailState().service?.syncStatus !== 'ok' &&
+        detailState().service?.syncError) {
         <span class="error">
           <mat-icon inline>error</mat-icon>
           {{ detailState().service?.syncError }}

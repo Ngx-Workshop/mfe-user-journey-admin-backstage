@@ -183,7 +183,9 @@ export class ServiceCardComponent {
       description: dto.description,
       languages: dto.languages,
       lastSyncAt: dto.lastSyncAt,
-      deviconLanguages: dto.deviconLanguages,
+      deviconLanguages:
+        dto.deviconLanguages?.sort((a, b) => a.localeCompare(b)) ??
+        [],
       repoName: dto.repoName,
       syncError: dto.syncError,
       syncStatus: dto.syncStatus,
