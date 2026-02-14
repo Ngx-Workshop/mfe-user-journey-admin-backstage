@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   inject,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,7 +9,7 @@ import {
   MatSnackBar,
   MatSnackBarModule,
 } from '@angular/material/snack-bar';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { SyncResponseDto } from '@tmdjr/backstage-contracts';
 import { NgxParticleHeader } from '@tmdjr/ngx-shared-headers';
 import { BackstageFiltersComponent } from '../components/backstage-filters.component';
@@ -25,7 +24,6 @@ import { BackstageFacadeService } from '../services/backstage-facade.service';
     BackstageFiltersComponent,
     BackstageResultsComponent,
     NgxParticleHeader,
-    RouterLink,
     MatIconModule,
   ],
   template: `
@@ -33,10 +31,6 @@ import { BackstageFacadeService } from '../services/backstage-facade.service';
       <h1 class="header">Backstage</h1>
     </ngx-particle-header>
     <div class="action-bar">
-      <a matButton="filled" [routerLink]="lastRouteURL()">
-        <mat-icon>arrow_back</mat-icon> Back to
-        {{ lastRouteName() }}</a
-      >
       <div class="flex-spacer"></div>
       <button
         matButton="filled"
@@ -108,23 +102,6 @@ export class BackstageListPage {
   protected readonly facade = inject(BackstageFacadeService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
-
-  protected readonly lastRouteURL = computed(
-    () =>
-      this.router
-        .lastSuccessfulNavigation()
-        ?.previousNavigation?.extractedUrl.toString() ?? '/backstage'
-  );
-
-  protected readonly lastRouteName = computed(
-    () =>
-      this.router
-        .lastSuccessfulNavigation()
-        ?.previousNavigation?.extractedUrl.toString()
-        .split('/')[1]
-        .replace(/-/g, ' ')
-        .replace(/\b\w/g, (c) => c.toUpperCase()) || 'Backstage'
-  );
 
   onQueryChange(q: string) {
     this.facade.setQuery(q ?? '');
