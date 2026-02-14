@@ -38,12 +38,7 @@ import {
   ],
   template: `
     <ngx-particle-header class="header">
-      <h1>
-        {{
-          detailState().service?.repoName?.replace('-', ' ')
-            | titlecase
-        }}
-      </h1>
+      <h1>{{ detailState().service?.description }}</h1>
       <ngx-backstage-status-badge
         [status]="detailState().service?.syncStatus ?? 'failed'"
       ></ngx-backstage-status-badge>
