@@ -87,60 +87,25 @@ export const routes = [
 ];
 ```
 
-## Backend/API
+## Backend/API and architecture
 
-This MFE calls the Backstage API via a **relative** base URL:
+The stateless client calls same-origin /api/backstage/services, /services/:repo,
+/sync and /services/:repo/{readme|openapi|runbook|metadata}. The gateway routes this
+prefix to service-backstage. Document endpoints return raw text, adapted into typed
+viewer documents; the backend remains responsible for authorization.
 
-- `/api/backstage/…` (see `src/app/backstage/services/backstage-api-client.service.ts`)
+Feature code lives in src/app/features/backstage, split into api, singleton state,
+models, pure utils, scoped page view models and reusable input/output views.
+RxJS owns asynchronous orchestration/cancellation; readonly signals expose state.
+Components keep templates and BEM SCSS inline.
 
-That means the **host app / gateway** must route `/api/backstage` to the Backstage service.
+The remote routes are list and details/:repo; mounted in the shell they become
+/backstage/list and /backstage/details/:repo. The empty route redirects to list.
 
-Key calls:
-
-- `GET /api/backstage/backstage/services` (list)
-- `GET /api/backstage/backstage/services/:repo` (detail)
-- `POST /api/backstage/backstage/sync` (sync all)
-- `GET /api/backstage/backstage/services/:repo/{readme|openapi|runbook|metadata}` (doc blobs)
-
-## Architecture overview
-
-### Runtime entrypoints
-
-- `src/main.ts` → dynamic import of `src/bootstrap.ts`
-- `src/bootstrap.ts` → `bootstrapApplication(App, appConfig)`
-- `src/app/app.config.ts` → sets up router, HttpClient, animations, Reactive Forms, and **zoneless** change detection
-
-### Routing
-
-The remote ships its own routes in `src/app/app.routes.ts`:
-
-- `/backstage` → list page
-- `/backstage/:repo` → detail page
-
-These are the routes hosts usually mount under a shell route segment.
-
-### Feature layout
-
-Core Backstage feature code lives under `src/app/backstage/`:
-
-- `pages/`
-  - `backstage-list.page.ts`: list + search + sync all
-  - `backstage-detail.page.ts`: detail header + tabbed docs
-- `services/`
-  - `backstage-api-client.service.ts`: HTTP client (relative `/api/backstage/`)
-  - `backstage-facade.service.ts`: state + orchestration (signals + RxJS)
-- `components/`
-  - `markdown-viewer.component.ts`: README/runbook rendering (via `marked`)
-  - `openapi-viewer.component.ts`: OpenAPI explorer (operation search + schema)
-  - `schema-tree.component.ts`: schema visualization
-
-### State management (signals + RxJS)
-
-The pattern used is:
-
-- **Signals** for UI state (`listState`, `detailState`, `docStates`, `search`, …)
-- **RxJS streams** for debounced search and list reloads
-- “Docs” are lazy-loaded: switching tabs triggers a fetch only if the doc content is missing
+Read [architecture](docs/architecture.md), [API contracts](docs/api-contracts.md),
+[source organization](docs/source-organization.md) and [development](docs/development.md).
+The local [Spec Kit workflow](.specify/README.md) is adapted from the document editor;
+[AGENTS.md](AGENTS.md) is the entry point and [specs](specs/README.md) indexes work.
 
 ## Scripts
 

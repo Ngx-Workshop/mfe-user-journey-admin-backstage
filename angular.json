@@ -28,7 +28,9 @@
                 "output": "."
               }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "src/styles.scss"
+            ],
             "main": "src/main.ts",
             "outputPath": "dist/mfe-user-journey-admin-backstage",
             "index": "src/index.html",
@@ -92,7 +94,12 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "src/styles.scss"
+            ],
+            "include": [
+              "../testing/**/*.spec.ts"
+            ]
           }
         }
       }

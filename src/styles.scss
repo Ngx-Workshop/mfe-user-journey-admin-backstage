@@ -2,11 +2,8 @@
 
 :root {
   color-scheme: light;
-  --page-gradient: radial-gradient(
-      circle at 10% 20%,
-      #f1f5ff,
-      #ffffff 35%
-    ),
+  --page-gradient:
+    radial-gradient(circle at 10% 20%, #f1f5ff, #ffffff 35%),
     radial-gradient(
       circle at 80% 0%,
       #fef3e5,

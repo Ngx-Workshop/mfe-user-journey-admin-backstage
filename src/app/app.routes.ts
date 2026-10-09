@@ -1,6 +1,6 @@
 import { Route } from '@angular/router';
-import { BackstageDetailPage } from './backstage/pages/backstage-detail.page';
-import { BackstageListPage } from './backstage/pages/backstage-list.page';
+import { BackstageDetailPage } from './features/backstage/pages/backstage-detail.page';
+import { BackstageListPage } from './features/backstage/pages/backstage-list.page';
 
 export const Routes: Route[] = [
   { path: '', redirectTo: 'list', pathMatch: 'full' },

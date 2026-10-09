@@ -18,6 +18,12 @@ module.exports = withModuleFederationPlugin({
       strictVersion: true,
       requiredVersion: '21.1.0',
     },
+    // Match the host's singleton interop entry to preserve Angular injection context.
+    '@angular/core/rxjs-interop': {
+      singleton: true,
+      strictVersion: true,
+      requiredVersion: '21.1.0',
+    },
     '@angular/common': {
       singleton: true,
       strictVersion: true,
