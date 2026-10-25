@@ -8,6 +8,8 @@ identifiers break `license-webpack-plugin@4.0.2` with an undefined `trim` error.
 Both pins keep one compatible webpack runtime. Keep license extraction enabled;
 validate a normal production build and non-empty `3rdpartylicenses.txt` before
 removing these pins after an upstream fix.
+Regenerate the lockfile with CI's Node 22/npm 10, then verify with `npm ci`;
+npm 11 can omit optional peer entries required by npm 10.
 
 Install using npm ci. Angular dev server and static bundle server both use port 4201;
 do not start a second server over an existing one. npm start uses the dev server;
