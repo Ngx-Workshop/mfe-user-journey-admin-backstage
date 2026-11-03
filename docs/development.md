@@ -29,3 +29,11 @@ chunks. Preserve the user's running server.
 
 Constitution, architecture and specs document ownership and validation. Final
 results are in specs/001-mvvm-refactor/handoff.md. No deployment is required.
+
+## Design-system verification
+Use npm run build -- --output-path dist/migration-verification to preserve the
+running watcher. Strict checks: ./node_modules/.bin/tsc --noEmit --noUnusedLocals
+--noUnusedParameters -p tsconfig.app.json and the spec config. The presentation
+migration evidence is in specs/002-design-system/handoff.md. Smoke checks use
+read-only catalogue/document requests; sync-all and forced per-repo refresh are
+covered with doubles rather than modifying live repository sync state.

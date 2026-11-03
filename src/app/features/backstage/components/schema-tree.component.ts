@@ -118,17 +118,17 @@ import { buildSchemaTree } from '../utils/schema-tree.utils';
         display: grid;
         gap: 0.5rem;
         font-size: 0.92rem;
-        color: var(--mat-sys-on-surface);
+        color: var(--ngx-color-text);
       }
       .schema-tree__schema-empty {
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
         font-style: italic;
       }
       details.schema-tree__node {
-        border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
-        border-radius: 8px;
+        border: 1px solid var(--ngx-color-border);
+        border-radius: var(--ngx-radius);
         padding: 0.35rem 0.6rem;
-        background: var(--mat-sys-surface-container-low, #fafafa);
+        background: var(--ngx-color-surface-low);
       }
       details.schema-tree__node > summary {
         cursor: pointer;
@@ -142,10 +142,10 @@ import { buildSchemaTree } from '../utils/schema-tree.utils';
         display: none;
       }
       .schema-tree__node.schema-tree--leaf {
-        border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
-        border-radius: 8px;
+        border: 1px solid var(--ngx-color-border);
+        border-radius: var(--ngx-radius);
         padding: 0.35rem 0.6rem;
-        background: var(--mat-sys-surface-container-low, #fafafa);
+        background: var(--ngx-color-surface-low);
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -155,33 +155,33 @@ import { buildSchemaTree } from '../utils/schema-tree.utils';
         font-weight: 600;
       }
       .schema-tree__node-type {
-        font-family: var(--mat-sys-label-large-font, inherit);
+        font-family: var(--ngx-font-mono);
         font-size: 0.8rem;
-        color: var(--mat-sys-on-surface-variant);
-        border: 1px solid var(--mat-sys-outline-variant, #ddd);
-        border-radius: 999px;
+        color: var(--ngx-color-muted);
+        border: 1px solid var(--ngx-color-border);
+        border-radius: var(--ngx-radius);
         padding: 0.05rem 0.45rem;
       }
       .schema-tree__node-format,
       .schema-tree__node-required,
       .schema-tree__node-circular {
         font-size: 0.75rem;
-        color: var(--mat-sys-on-surface-variant);
-        border: 1px dashed var(--mat-sys-outline-variant, #ddd);
-        border-radius: 999px;
+        color: var(--ngx-color-muted);
+        border: 1px dashed var(--ngx-color-border);
+        border-radius: var(--ngx-radius);
         padding: 0.05rem 0.4rem;
       }
       .schema-tree__node-circular {
-        color: #b71c1c;
-        border-color: #b71c1c;
+        color: var(--ngx-color-error);
+        border-color: var(--ngx-color-error);
       }
       .schema-tree__node-description {
         margin-top: 0.35rem;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
       }
       .schema-tree__node-enum {
         margin-top: 0.35rem;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
       }
       .schema-tree__children {
         display: grid;

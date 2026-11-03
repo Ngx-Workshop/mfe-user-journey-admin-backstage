@@ -1,3 +1,4 @@
+import { NgxCodeBlock } from '@tmdjr/ngx-workshop-design-system';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,7 +12,7 @@ import {
 import { formatJson } from '../utils/document.utils';
 @Component({
   selector: 'ngx-backstage-openapi-media',
-  imports: [SchemaTreeComponent],
+  imports: [NgxCodeBlock, SchemaTreeComponent],
   template: `
     @for (entry of entries(); track entry.mediaType) {
       <div class="openapi-media__content-block">
@@ -28,7 +29,7 @@ import { formatJson } from '../utils/document.utils';
         @if (entry.example !== undefined) {
           <div class="openapi-media__example">
             <div class="openapi-media__example-title">Example</div>
-            <pre><code>{{ formatJson(entry.example) }}</code></pre>
+            <ngx-code-block [code]="formatJson(entry.example)" label="Example" language="json" [wrap]="true" />
           </div>
         }
       </div>
@@ -37,13 +38,13 @@ import { formatJson } from '../utils/document.utils';
   styles: [
     `
       :host {
-        display: block;
+        display: block; min-width: 0; position: relative;
       }
       .openapi-media__content-block {
-        border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
-        border-radius: 8px;
+        border: 1px solid var(--ngx-color-border);
+        border-radius: var(--ngx-radius);
         padding: 0.6rem;
-        background: var(--mat-sys-surface-container-high, #fff);
+        background: var(--ngx-color-surface-high);
         display: grid;
         gap: 0.6rem;
       }
@@ -55,16 +56,16 @@ import { formatJson } from '../utils/document.utils';
       .openapi-media__content-type {
         font-size: 0.75rem;
         text-transform: uppercase;
-        border: 1px solid var(--mat-sys-outline-variant, #ddd);
+        border: 1px solid var(--ngx-color-border);
         padding: 0.1rem 0.45rem;
-        border-radius: 999px;
-        color: var(--mat-sys-on-surface-variant);
+        border-radius: var(--ngx-radius);
+        color: var(--ngx-color-muted);
       }
       .openapi-media__example pre {
         margin: 0;
         padding: 0.5rem;
-        background: var(--mat-sys-surface-container-low, #fafafa);
-        border-radius: 6px;
+        background: var(--ngx-color-surface-low);
+        border-radius: var(--ngx-radius);
         overflow: auto;
         font-size: 0.8rem;
       }

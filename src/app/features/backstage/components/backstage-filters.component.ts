@@ -1,3 +1,4 @@
+import { NgxButton } from '@tmdjr/ngx-workshop-design-system';
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -40,7 +41,7 @@ const repoNamePrefixes: RepoNamePrefixesSearchParam[] = [
 
 @Component({
   selector: 'ngx-backstage-filters',
-  imports: [
+  imports: [NgxButton,
     CommonModule,
     MatFormFieldModule,
     MatSelectModule,
@@ -56,7 +57,7 @@ const repoNamePrefixes: RepoNamePrefixesSearchParam[] = [
         class="backstage-filters__filter-row backstage-filters__header"
       >
         <h3>Filters</h3>
-        <button matButton (click)="clearAllFilters()">
+        <button mat-flat-button ngxButton surface="outline" (click)="clearAllFilters()">
           <mat-icon>clear_all</mat-icon> Clear All
         </button>
       </div>
@@ -66,13 +67,13 @@ const repoNamePrefixes: RepoNamePrefixesSearchParam[] = [
           appearance="outline"
           class="backstage-filters__search-bar"
         >
-          <mat-label>Search services</mat-label>
+          <mat-label>Search repositories</mat-label>
           <input
             matInput
             placeholder="Name, description, topic"
             [value]="searchTerm()"
             (input)="onInput($event)"
-            aria-label="Search services"
+            aria-label="Search repositories"
           />
           @if (hasQuery()) {
             <button
@@ -99,8 +100,8 @@ const repoNamePrefixes: RepoNamePrefixesSearchParam[] = [
           appearance="outline"
           class="backstage-filters__repo-prefix-select"
         >
-          <mat-label>Quick Search with Repo Prefixes</mat-label>
-          <mat-select
+          <mat-label>Repository prefix</mat-label>
+          <mat-select panelClass="ngx-design-system-overlay ngx-select-panel"
             [value]="selectedPrefix()"
             (valueChange)="onQueryChange($event)"
           >
@@ -117,63 +118,16 @@ const repoNamePrefixes: RepoNamePrefixesSearchParam[] = [
       </div>
     </div>
   `,
-  styles: [
-    `
-      .backstage-filters__filters {
-        background: var(--mat-sys-surface-container-low);
-        padding: 1.5rem;
-        border-radius: var(
-          --mat-card-elevated-container-shape,
-          var(--mat-sys-corner-medium)
-        );
-        margin-bottom: 2rem;
-        h3 {
-          margin-top: 0;
-          margin-bottom: 1rem;
-        }
-      }
-
-      .backstage-filters__search-bar {
-        width: 100%;
-        max-width: 600px;
-      }
-      .backstage-filters__repo-prefix-select {
-        width: 100%;
-        max-width: 300px;
-      }
-
-      .backstage-filters__filter-row {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        align-items: center;
-        margin-bottom: 1rem;
-
-        &.backstage-filters__header {
-          justify-content: space-between;
-        }
-      }
-
-      .backstage-filters__filter-row:last-child {
-        margin-bottom: 0;
-      }
-
-      .backstage-filters__filter-row mat-form-field {
-        min-width: 200px;
-      }
-
-      @media (max-width: 768px) {
-        .backstage-filters__filter-row {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .backstage-filters__filter-row mat-form-field {
-          min-width: auto;
-        }
-      }
-    `,
-  ],
+  styles: [`
+    @use '@angular/material' as mat;
+    :host { display: block; min-width: 0; @include mat.form-field-density(-3); }
+    .backstage-filters__filters { display: grid; gap: 0.75rem; }
+    .backstage-filters__filter-row { display: flex; flex-direction: column; align-items: stretch; gap: 1rem; }
+    .backstage-filters__header { flex-direction: row; align-items: center; justify-content: space-between; }
+    .backstage-filters__header h3 { margin: 0; font: var(--ngx-font-label); }
+    mat-form-field { width: 100%; min-width: 0; }
+    mat-slide-toggle { font-size: 0.75rem; }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BackstageFiltersComponent {

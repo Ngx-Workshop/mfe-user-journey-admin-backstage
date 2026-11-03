@@ -94,7 +94,7 @@ import { marked } from 'marked';
   styles: [
     `
       :host {
-        display: block;
+        display: block; min-width: 0;
       }
       .markdown-viewer__doc-header {
         display: grid;
@@ -115,90 +115,37 @@ import { marked } from 'marked';
         gap: 0.25rem;
       }
       .markdown-viewer__meta {
-        display: flex;
+        display: flex; flex-wrap: wrap; overflow-wrap: anywhere;
         gap: 0.75rem;
         align-items: center;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
         font-size: 0.9rem;
       }
       .markdown-viewer__body {
-        border-radius: 16px;
-        padding: 2rem;
-        background: var(--mat-sys-surface-container-high, #fafafa);
+        border-radius: var(--ngx-radius);
+        padding: 1rem;
+        background: var(--ngx-color-surface-high);
       }
 
       :host ::ng-deep .markdown-viewer__markdown {
-        font: var(--mat-sys-body-large);
-        h1 {
-          font: var(--mat-sys-display-large);
-        }
-        h2 {
-          font: var(--mat-sys-display-medium);
-        }
-        h3 {
-          font: var(--mat-sys-display-small);
-        }
-        h4 {
-          font: var(--mat-sys-headline-large);
-        }
-        h5 {
-          font: var(--mat-sys-headline-medium);
-        }
-        h6 {
-          font: var(--mat-sys-headline-small);
-        }
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-          margin: 0;
-          sup {
-            font-weight: 100;
-            font-size: 3.5rem;
-          }
-        }
-
-        pre {
-          color: var(--mat-sys-on-secondary-container);
-          background: var(--mat-sys-secondary-container);
-          padding: 1rem;
-          border-radius: 16px;
-          overflow: auto;
-          font-family: 'Fira Code', monospace;
-          code {
-            font-size: 1rem;
-          }
-        }
-        code {
-          background: var(--mat-sys-secondary-container);
-          padding: 0.5rem;
-          border-radius: 16px;
-          font-family: 'Fira Code', monospace;
-          font-size: 0.8rem;
-        }
-
-        li {
-          margin: 12px 0px;
-        }
-
-        table img {
-          max-width: 100%;
-          height: auto;
-          display: block;
-          object-fit: contain;
-        }
+        font: 400 0.875rem/1.7 var(--ngx-font-body); overflow-wrap: anywhere;
+        h1, h2, h3, h4, h5, h6 { font-family: var(--ngx-font-heading); line-height: 1.4; color: var(--ngx-color-text); margin: 1rem 0 0.5rem; }
+        h1 { font-size: 1.5rem; } h2 { font-size: 1.3rem; } h3 { font-size: 1.1rem; }
+        h4, h5, h6 { font-size: 0.95rem; }
+        pre { background: var(--ngx-color-surface-low); border: 1px solid var(--ngx-color-border); padding: 0.75rem; overflow: auto; white-space: pre-wrap; }
+        code { font-family: var(--ngx-font-mono); font-size: 0.8rem; color: var(--ngx-color-primary); }
+        img { max-width: 100%; height: auto; }
+        table { max-width: 100%; display: block; overflow: auto; }
       }
       .markdown-viewer__empty {
         display: grid;
         gap: 0.35rem;
         justify-items: center;
         padding: 1.25rem;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
       }
       .markdown-viewer__empty.markdown-viewer--error {
-        color: #b71c1c;
+        color: var(--ngx-color-error);
       }
       .markdown-viewer__empty mat-icon {
         font-size: 28px;

@@ -1,3 +1,4 @@
+import { BackstageDetailTabsComponent } from '../../../../../src/app/features/backstage/components/backstage-detail-tabs.component';
 import { TestBed } from '@angular/core/testing';
 import { OpenApiViewerComponent } from '../../../../../src/app/features/backstage/components/openapi-viewer.component';
 import { BackstageFiltersComponent } from '../../../../../src/app/features/backstage/components/backstage-filters.component';
@@ -155,4 +156,38 @@ describe('Backstage views', () => {
     expect(click).toHaveBeenCalled();
     expect(revoke).toHaveBeenCalledWith('blob:document');
   });
+  it('separates sync issues without duplicates and preserves row view/refresh intents', async () => {
+    const fixture = TestBed.createComponent(BackstageResultsComponent);
+    fixture.componentRef.setInput('state', { loading: false, items: [
+      { repoName: 'healthy-repo', topics: [], syncStatus: 'ok' },
+      { repoName: 'idle-repo', topics: [], syncStatus: 'idle' },
+      { repoName: 'failed-repo', topics: [], syncStatus: 'failed', syncError: 'Fetch failed' },
+    ] });
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const panels = el.querySelectorAll('ngx-backstage-panel');
+    expect(panels[0].querySelectorAll('ngx-backstage-service-card').length).toBe(2);
+    expect(panels[1].querySelectorAll('ngx-backstage-service-card').length).toBe(1);
+    expect(panels[0].textContent).not.toContain('failed-repo');
+    const view = spyOn(fixture.componentInstance.view, 'emit');
+    const refresh = spyOn(fixture.componentInstance.refresh, 'emit');
+    el.querySelector<HTMLButtonElement>('[aria-label="View details failed-repo"]')!.click();
+    el.querySelector<HTMLButtonElement>('[aria-label="Refresh failed-repo"]')!.click();
+    expect(view).toHaveBeenCalledWith('failed-repo');
+    expect(refresh).toHaveBeenCalledWith('failed-repo');
+  });
+  it('keeps missing document sections selectable and emits their reload intent', async () => {
+    const fixture = TestBed.createComponent(BackstageDetailTabsComponent);
+    const select = spyOn(fixture.componentInstance.tabChange, 'emit');
+    const reload = spyOn(fixture.componentInstance.reloadDoc, 'emit');
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    Array.from(el.querySelectorAll('button')).find(button => button.textContent?.trim() === 'Runbook')!.click();
+    await fixture.whenStable();
+    expect(select).toHaveBeenCalledWith('runbook');
+    expect(el.textContent).toContain('Runbook not provided');
+    el.querySelector<HTMLButtonElement>('[aria-label="Reload"]')!.click();
+    expect(reload).toHaveBeenCalledWith({ kind: 'runbook', refresh: true });
+  });
+
 });

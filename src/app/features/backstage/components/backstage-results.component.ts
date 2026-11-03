@@ -1,142 +1,80 @@
-import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { NgxButton } from '@tmdjr/ngx-workshop-design-system';
 import { ListState } from '../models/backstage-state.models';
+import { BackstagePanelComponent } from './backstage-panel.component';
 import { ServiceCardComponent } from './service-card.component';
-
 @Component({
-  selector: 'ngx-backstage-results',
-  imports: [
-    CommonModule,
-    MatIconModule,
-    MatButtonModule,
-    MatProgressBarModule,
-    ServiceCardComponent,
-  ],
+  selector: 'ngx-backstage-results', imports: [NgxButton, MatButtonModule, MatIconModule, MatProgressBarModule, BackstagePanelComponent, ServiceCardComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="backstage-results__results" aria-live="polite">
-      @if (state().loading) {
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      }
-      @if (state().error) {
-        <div class="backstage-results--error" role="alert">
-          <p>{{ state().error }}</p>
-          <button mat-stroked-button (click)="onRefreshList()">
-            Retry
-          </button>
+    <div class="backstage-results" [class.backstage-results--issues]="issues().length">
+      @if (issues().length) {
+        <div class="backstage-results__switch" role="group" aria-label="Repository result panels">
+          <button mat-flat-button ngxButton surface="glass" type="button" [attr.aria-pressed]="pane() === 'repos'" (click)="pane.set('repos')">Catalogue ({{ repos().length }})</button>
+          <button mat-flat-button ngxButton surface="glass" type="button" [attr.aria-pressed]="pane() === 'issues'" (click)="pane.set('issues')">Sync issues ({{ issues().length }})</button>
         </div>
       }
-      @if (hasItems()) {
-        <div class="backstage-results__grid" role="list">
-          @for (svc of state().items; track svc.repoName) {
-            <ngx-backstage-service-card
-              role="listitem"
-              [serviceSummaryDto]="svc"
-              (view)="onView($event)"
-              (refresh)="onRefresh($event)"
-            ></ngx-backstage-service-card>
+      <ngx-backstage-panel heading="Repositories" eyebrow="BACKSTAGE / CATALOGUE" background="grid"
+        [class.backstage-results__panel--hidden]="issues().length && pane() !== 'repos'" [resetKey]="state().items">
+        <span backstagePanelHeader class="backstage-results__count">{{ repos().length }} repositories</span>
+        <button backstagePanelHeader mat-icon-button type="button" aria-label="Refresh repository list" [disabled]="state().loading" (click)="onRefreshList()"><mat-icon>refresh</mat-icon></button>
+        @if (state().loading) { <mat-progress-bar mode="indeterminate" aria-label="Loading repositories" /> }
+        @if (state().error) {
+          <div class="backstage-results__error" role="alert"><p>{{ state().error }}</p><button mat-flat-button ngxButton surface="outline" (click)="onRefreshList()">Retry</button></div>
+        }
+        <div role="list">
+          @for (svc of repos(); track svc.repoName) {
+            <ngx-backstage-service-card role="listitem" [serviceSummaryDto]="svc" (view)="onView($event)" (refresh)="onRefresh($event)" />
+          } @empty {
+            @if (!state().loading) {
+              <div class="backstage-results__empty" [attr.data-testid]="state().unauthorized ? 'unauthorized' : 'empty'">
+                <mat-icon>{{ state().unauthorized ? 'lock' : 'search_off' }}</mat-icon>
+                <h2>{{ state().unauthorized ? 'Unauthorized' : state().error ? 'Unable to load services' : issues().length ? 'Repositories needing attention are in Sync issues' : 'No services found' }}</h2>
+                <p>{{ state().unauthorized ? 'Check your access or sign in to view backstage services.' : 'Adjust your search or inspect sync issues.' }}</p>
+              </div>
+            }
           }
         </div>
-      } @else if (!state().loading) {
-        @if (state().unauthorized) {
-          <div
-            class="backstage-results__empty"
-            data-testid="unauthorized"
-          >
-            <mat-icon aria-hidden="true">lock</mat-icon>
-            <div class="backstage-results__title">Unauthorized</div>
-            <p>
-              Check your access or sign in to view backstage services.
-            </p>
+      </ngx-backstage-panel>
+      @if (issues().length) {
+        <ngx-backstage-panel heading="Sync issues" eyebrow="BACKSTAGE / REPAIR" shape="beveled" tone="secondary"
+          [class.backstage-results__panel--hidden]="pane() !== 'issues'" [resetKey]="state().items">
+          <span backstagePanelHeader class="backstage-results__count">{{ issues().length }} issues</span>
+          <div role="list">
+            @for (svc of issues(); track svc.repoName) {
+              <ngx-backstage-service-card role="listitem" [serviceSummaryDto]="svc" (view)="onView($event)" (refresh)="onRefresh($event)" />
+            }
           </div>
-        } @else {
-          <div class="backstage-results__empty" data-testid="empty">
-            <mat-icon aria-hidden="true">search_off</mat-icon>
-            <div class="backstage-results__title">
-              {{
-                state().error
-                  ? 'Unable to load services'
-                  : 'No services found'
-              }}
-            </div>
-            <p>Adjust your search or try again later.</p>
-            <button
-              mat-stroked-button
-              color="primary"
-              (click)="onRefreshList()"
-            >
-              <mat-icon>refresh</mat-icon>
-              Retry
-            </button>
-          </div>
-        }
+        </ngx-backstage-panel>
       }
-    </section>
+    </div>
   `,
-  styles: [
-    `
-      .backstage-results__results {
-        background: var(--mat-sys-surface-container-low);
-        padding: 1.5rem;
-        border-radius: var(
-          --mat-card-elevated-container-shape,
-          var(--mat-sys-corner-medium)
-        );
-      }
-      .backstage-results__grid {
-        display: grid;
-        grid-template-columns: repeat(
-          auto-fill,
-          minmax(min(100%, 375px), 1fr)
-        );
-        gap: 1rem;
-      }
-      .backstage-results__empty {
-        display: grid;
-        gap: 0.5rem;
-        justify-items: center;
-        text-align: center;
-        color: var(--mat-sys-on-surface-variant);
-        padding: 2rem 1rem;
-        border: 1px dashed var(--mat-sys-outline-variant, #ddd);
-        border-radius: 12px;
-      }
-      .backstage-results__empty mat-icon {
-        font-size: 40px;
-      }
-      .backstage-results__title {
-        font-weight: 700;
-      }
-    `,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [`
+    :host { display: block; min-height: 0; min-width: 0; height: 100%; }
+    .backstage-results { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); min-height: 0; height: 100%; }
+    .backstage-results--issues { grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 1rem; }
+    .backstage-results__switch { display: none; }
+    .backstage-results__error { color: var(--ngx-color-error); font-size: 0.8rem; }
+    .backstage-results__empty { padding: 1.5rem 0.5rem; text-align: center; font-size: 0.8rem; }
+    .backstage-results__empty h2 { font-size: 0.9rem; }
+    @media (max-width: 1100px) {
+      .backstage-results--issues { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 0.25rem; }
+      .backstage-results__count { display: none; }
+      .backstage-results__switch { display: flex; }
+      .backstage-results__switch button[aria-pressed='true'] { background: var(--ngx-color-surface-high); }
+      .backstage-results--issues > ngx-backstage-panel { grid-column: 1; grid-row: 2; }
+      .backstage-results__panel--hidden { display: none; }
+    }
+  `],
 })
 export class BackstageResultsComponent {
-  readonly state = input.required<ListState>();
-
-  readonly view = output<string>();
-  readonly refresh = output<string>();
-  readonly refreshList = output<void>();
-
+  readonly state = input.required<ListState>(); readonly view = output<string>(); readonly refresh = output<string>(); readonly refreshList = output<void>();
+  readonly pane = signal<'repos' | 'issues'>('repos');
+  readonly issues = computed(() => this.state().items.filter(item => ['failed', 'partial', 'rate_limited'].includes(item.syncStatus)));
+  readonly repos = computed(() => this.state().items.filter(item => !['failed', 'partial', 'rate_limited'].includes(item.syncStatus)));
   readonly hasItems = computed(() => this.state().items.length > 0);
-
-  onView(repo: string) {
-    this.view.emit(repo);
-  }
-
-  onRefresh(repo: string) {
-    this.refresh.emit(repo);
-  }
-
-  onRefreshList() {
-    this.refreshList.emit();
-  }
+  onView(repo: string) { this.view.emit(repo); } onRefresh(repo: string) { this.refresh.emit(repo); } onRefreshList() { this.refreshList.emit(); }
 }

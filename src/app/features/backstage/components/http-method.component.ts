@@ -16,49 +16,17 @@ import { HttpMethod } from '../models/openapi.models';
       >{{ method().toUpperCase() }}</span
     >
   `,
-  styles: [
-    `
-      .http-method__method-get {
-        background: #61affe;
-      }
-      .http-method__method-post {
-        background: #49cc90;
-      }
-      .http-method__method-put {
-        background: #fca130;
-      }
-      .http-method__method-delete {
-        background: #f93e3e;
-      }
-      .http-method__method-patch {
-        background: #50e3c2;
-      }
-      .http-method__method-options {
-        background: #9012fe;
-      }
-      .http-method__method-head {
-        background: #0f6ab4;
-      }
-      .http-method__method-trace {
-        background: #b71c1c;
-      }
-      :host {
-        display: block;
-      }
-      .http-method__method-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        padding: 0.1rem 0.45rem;
-        border-radius: 6px;
-        color: #fff;
-        min-width: 48px;
-      }
-    `,
-  ],
+  styles: [`
+    :host { display: inline-block; }
+    .http-method__method-badge { --method-color: var(--ngx-color-primary); display: inline-flex;
+      align-items: center; justify-content: center; min-width: 48px; padding: 2px 6px;
+      font: 600 0.65rem/1.5 var(--ngx-font-mono); color: var(--ngx-color-text);
+      border: 1px solid var(--method-color); background: color-mix(in srgb, var(--method-color) 14%, var(--ngx-color-surface)); }
+    .http-method__method-post { --method-color: var(--ngx-color-success); }
+    .http-method__method-put, .http-method__method-patch { --method-color: var(--ngx-color-warning); }
+    .http-method__method-delete, .http-method__method-trace { --method-color: var(--ngx-color-error); }
+    .http-method__method-options, .http-method__method-head { --method-color: var(--ngx-color-secondary); }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HttpMethodComponent {

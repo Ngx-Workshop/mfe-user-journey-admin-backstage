@@ -51,7 +51,7 @@ import { schemaLabel } from '../utils/openapi.utils';
       .openapi-parameters__empty {
         padding: 0.5rem;
         text-align: center;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
         font-size: 0.85rem;
       }
       .openapi-parameters__table-wrap {
@@ -67,7 +67,7 @@ import { schemaLabel } from '../utils/openapi.utils';
         text-align: left;
         padding: 0.4rem 0.5rem;
         border-bottom: 1px solid
-          var(--mat-sys-outline-variant, #e0e0e0);
+          var(--ngx-color-border);
       }
       th {
         font-weight: 600;

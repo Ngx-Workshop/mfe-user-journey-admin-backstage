@@ -1,102 +1,54 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-} from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { NgxParticleHeader } from '@tmdjr/ngx-shared-headers';
+import { NgxActionBar, NgxButton, NgxInlineStatus } from '@tmdjr/ngx-workshop-design-system';
 import { BackstageFiltersComponent } from '../components/backstage-filters.component';
 import { BackstageResultsComponent } from '../components/backstage-results.component';
+import { BackstagePanelComponent } from '../components/backstage-panel.component';
+import { observeWorkspaceHeight } from '../utils/panel-body-viewport';
 import { BackstageListViewModel } from './backstage-list.view-model';
-
 @Component({
-  selector: 'ngx-backstage-list-page',
-  providers: [BackstageListViewModel],
-  imports: [
-    MatButtonModule,
-    MatSnackBarModule,
-    BackstageFiltersComponent,
-    BackstageResultsComponent,
-    NgxParticleHeader,
-    MatIconModule,
-  ],
+  selector: 'ngx-backstage-list-page', host: { class: 'ngx-design-system' }, providers: [BackstageListViewModel],
+  imports: [MatButtonModule, MatIconModule, MatSnackBarModule, NgxActionBar, NgxButton, NgxInlineStatus, BackstageFiltersComponent, BackstageResultsComponent, BackstagePanelComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <ngx-particle-header>
-      <h1 class="backstage-list__header">Backstage</h1>
-    </ngx-particle-header>
-    <div class="backstage-list__action-bar">
-      <div class="backstage-list__flex-spacer"></div>
-      <button
-        matButton="filled"
-        [disabled]="vm.syncState().loading"
-        (click)="vm.syncAll()"
-      >
-        <mat-icon>sync</mat-icon>
-        Sync all
-      </button>
-    </div>
-
-    <main class="backstage-list__page-content">
-      <div class="backstage-list__container">
-        <ngx-backstage-filters
-          [searchTerm]="vm.search()"
-          [includeDocs]="vm.includeDocs()"
-          (queryChange)="vm.setQuery($event)"
-          (includeDocsChange)="vm.setIncludeDocs($event)"
-        ></ngx-backstage-filters>
-        <ngx-backstage-results
-          [state]="vm.listState()"
-          (view)="vm.view($event)"
-          (refresh)="vm.refresh($event)"
-          (refreshList)="vm.refreshList()"
-        ></ngx-backstage-results>
+    <ngx-action-bar heading="Backstage">
+      <ngx-inline-status ngxActionBarIndicators [label]="vm.syncState().loading ? 'Syncing repositories…' : vm.listState().items.length + ' repositories'" [tone]="vm.syncState().loading ? 'info' : 'neutral'" [announce]="true" />
+      <button class="backstage-list__sync" mat-flat-button ngxButton surface="outline" shape="chevron" type="button" [disabled]="vm.syncState().loading" (click)="vm.syncAll()"><mat-icon>sync</mat-icon>Sync all</button>
+    </ngx-action-bar>
+    <main class="backstage-list" aria-label="Repository catalogue">
+      <div #workspace class="backstage-list__workspace" [style.height.px]="workspaceHeight()">
+        <div class="backstage-list__switch" role="group" aria-label="Catalogue panels">
+          <button mat-button type="button" [attr.aria-pressed]="pane() === 'filters'" (click)="pane.set('filters')">Filters</button>
+          <button mat-button type="button" [attr.aria-pressed]="pane() === 'repos'" (click)="pane.set('repos')">Repositories</button>
+        </div>
+        <ngx-backstage-panel heading="Filter console" eyebrow="BACKSTAGE / FILTER" shape="chamfered" [class.backstage-list__panel--hidden]="pane() !== 'filters'">
+          <ngx-backstage-filters [searchTerm]="vm.search()" [includeDocs]="vm.includeDocs()" (queryChange)="vm.setQuery($event)" (includeDocsChange)="vm.setIncludeDocs($event)" />
+        </ngx-backstage-panel>
+        <ngx-backstage-results [class.backstage-list__panel--hidden]="pane() !== 'repos'" [state]="vm.listState()" (view)="vm.view($event)" (refresh)="vm.refresh($event)" (refreshList)="vm.refreshList()" />
       </div>
     </main>
   `,
-  styles: [
-    `
-      :host {
-        .backstage-list__header {
-          font-size: 1.85rem;
-          font-weight: 100;
-          margin: 1.7rem 1rem;
-        }
-        .backstage-list__page-content {
-          display: flex;
-          justify-content: center;
-        }
-        .backstage-list__container {
-          padding: 1rem;
-          flex: 0 1 clamp(480px, 70vw, 1400px);
-          max-width: 100%;
-        }
-        .backstage-list__flex-spacer {
-          flex: 1;
-        }
-        .backstage-list__action-bar {
-          position: sticky;
-          top: 56px;
-          height: 56px;
-          z-index: 5;
-          display: flex;
-          flex-direction: row;
-          width: 100%;
-          background: var(--mat-sys-primary);
-          align-items: center;
-          a,
-          button {
-            color: var(--mat-sys-on-primary);
-            background: var(--mat-sys-primary);
-            margin: 0 12px;
-          }
-        }
-      }
-    `,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [`
+    :host { display: block; min-width: 0; color: var(--ngx-color-text); background: var(--ngx-color-canvas); }
+    ngx-action-bar { --ngx-action-bar-top: var(--backstage-toolbar-top, 96px); }
+    .backstage-list { width: calc(100% - 2rem); margin: 0 auto; padding: 1rem 0; }
+    .backstage-list__workspace { display: grid; grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 1rem; min-height: 0; }
+    .backstage-list__switch { display: none; }
+    @media (max-width: 1100px) {
+      .backstage-list { width: calc(100% - 1rem); padding: 0.5rem 0 1rem; }
+      .backstage-list__workspace { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 0.5rem; }
+      .backstage-list__switch { display: flex; }
+      .backstage-list__switch button[aria-pressed='true'] { background: var(--ngx-color-surface-high); }
+      ngx-backstage-panel, ngx-backstage-results { grid-column: 1; grid-row: 2; }
+      .backstage-list__panel--hidden { display: none; }
+    }
+    @media (max-width: 720px) { .backstage-list__sync { min-width: 0; padding-inline: 8px; font-size: 0.7rem; } ngx-action-bar { --ngx-action-bar-top: var(--backstage-toolbar-top, 76px); } }
+  `],
 })
 export class BackstageListPage {
-  readonly vm = inject(BackstageListViewModel);
+  readonly vm = inject(BackstageListViewModel); readonly pane = signal<'filters' | 'repos'>('repos'); readonly workspaceHeight = signal(0);
+  private readonly workspace = viewChild.required<ElementRef<HTMLElement>>('workspace'); private readonly destroyRef = inject(DestroyRef);
+  constructor() { afterNextRender(() => this.destroyRef.onDestroy(observeWorkspaceHeight(this.workspace().nativeElement, height => this.workspaceHeight.set(height)))); }
 }

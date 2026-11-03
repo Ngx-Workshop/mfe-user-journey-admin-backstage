@@ -1,3 +1,4 @@
+import { NgxCodeBlock } from '@tmdjr/ngx-workshop-design-system';
 import { formatDocument } from '../utils/document.utils';
 import { CommonModule } from '@angular/common';
 import {
@@ -21,7 +22,7 @@ import { DocBlobDto } from '@tmdjr/backstage-contracts';
 @Component({
   selector: 'ngx-backstage-doc-viewer',
   standalone: true,
-  imports: [
+  imports: [NgxCodeBlock,
     CommonModule,
     MatButtonModule,
     MatIconModule,
@@ -101,7 +102,7 @@ import { DocBlobDto } from '@tmdjr/backstage-contracts';
             <div class="doc-viewer__title">{{ emptyLabel() }}</div>
           </div>
         } @else {
-          <pre><code>{{ formattedContent() }}</code></pre>
+          <ngx-code-block [code]="formattedContent()" [label]="title()" [language]="doc()?.format === 'json' ? 'json' : 'text'" [wrap]="true" />
         }
       </div>
     }
@@ -109,7 +110,7 @@ import { DocBlobDto } from '@tmdjr/backstage-contracts';
   styles: [
     `
       :host {
-        display: block;
+        display: block; min-width: 0; position: relative;
       }
       .doc-viewer__doc-header {
         display: grid;
@@ -131,24 +132,25 @@ import { DocBlobDto } from '@tmdjr/backstage-contracts';
         gap: 0.25rem;
       }
       .doc-viewer__meta {
-        display: flex;
+        display: flex; flex-wrap: wrap; overflow-wrap: anywhere;
         gap: 0.75rem;
         align-items: center;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
         font-size: 0.9rem;
       }
       .doc-viewer__badge {
         padding: 0.1rem 0.5rem;
-        border-radius: 999px;
-        border: 1px solid var(--mat-sys-outline);
+        border-radius: var(--ngx-radius);
+        border: 1px solid var(--ngx-color-border);
         font-size: 0.75rem;
         text-transform: uppercase;
       }
+      ngx-code-block { position: relative; min-width: 0; }
       .doc-viewer__body {
-        border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
-        border-radius: 8px;
+        border: 1px solid var(--ngx-color-border);
+        border-radius: var(--ngx-radius);
         padding: 0.75rem;
-        background: var(--mat-sys-surface-container-low, #fafafa);
+        background: var(--ngx-color-surface-low);
       }
       pre {
         margin: 0;
@@ -162,10 +164,10 @@ import { DocBlobDto } from '@tmdjr/backstage-contracts';
         gap: 0.35rem;
         justify-items: center;
         padding: 1.25rem;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
       }
       .doc-viewer__empty.doc-viewer--error {
-        color: #b71c1c;
+        color: var(--ngx-color-error);
       }
       .doc-viewer__empty mat-icon {
         font-size: 28px;

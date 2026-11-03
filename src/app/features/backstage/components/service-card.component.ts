@@ -1,211 +1,50 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { ServiceSummaryDto } from '@tmdjr/backstage-contracts';
 import { StatusBadgeComponent } from './status-badge.component';
-
 @Component({
-  selector: 'ngx-backstage-service-card',
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatChipsModule,
-    MatButtonModule,
-    MatIconModule,
-    StatusBadgeComponent,
-  ],
-  template: `
-    <mat-card class="service-card">
-      @if (viewModel(); as vm) {
-        <mat-card-header>
-          <div class="service-card__title-row">
-            <div class="service-card__meta">
-              <div class="service-card__meta-row">
-                <mat-icon inline>update</mat-icon>
-                <span>
-                  Last sync:
-                  {{
-                    vm.lastSyncAt
-                      ? (vm.lastSyncAt | date: 'short')
-                      : 'Never'
-                  }}
-                </span>
-              </div>
-              @if (vm.syncStatus !== 'ok' && vm.syncError) {
-                <div
-                  class="service-card__meta-row service-card--error"
-                >
-                  <mat-icon inline>error</mat-icon>
-                  <span>{{ vm.syncError }}</span>
-                </div>
-              }
-
-              <div class="service-card__meta-row">
-                @for (lang of vm.deviconLanguages; track lang) {
-                  <i [class]="lang"></i>
-                }
-              </div>
-            </div>
-
-            <div class="service-card__repo-desc">
-              {{ vm.description ?? 'MISSING DESCRIPTION' }}
-            </div>
-            <div class="service-card__repo-name">
-              <pre><code>{{ vm.repoName }}</code></pre>
-            </div>
-          </div>
-          <div class="service-card__flex-spacer"></div>
-          <ngx-backstage-status-badge
-            [status]="vm.syncStatus"
-          ></ngx-backstage-status-badge>
-        </mat-card-header>
-
-        <mat-card-content>
-          @if (vm.topics.length > 0) {
-            <div class="service-card__chips">
-              <mat-chip-set>
-                @for (topic of vm.topics; track topic) {
-                  <mat-chip appearance="outlined">
-                    <i [class]="'angular'"></i>
-                    {{ topic }}</mat-chip
-                  >
-                }
-              </mat-chip-set>
-            </div>
-          } @else {
-            <mat-chip
-              class="service-card__muted"
-              appearance="outlined"
-              >No topics</mat-chip
-            >
-          }
-        </mat-card-content>
-
-        <mat-card-actions align="end">
-          <button
-            mat-button
-            (click)="onView()"
-            aria-label="View details"
-          >
-            <mat-icon>open_in_new</mat-icon>
-            View
-          </button>
-          <button
-            mat-button
-            (click)="onRefresh()"
-            aria-label="Refresh"
-          >
-            <mat-icon>refresh</mat-icon>
-            Refresh
-          </button>
-        </mat-card-actions>
-      }
-    </mat-card>
-  `,
-  styles: [
-    `
-      :host {
-        .service-card {
-          display: grid;
-          gap: 0.5rem;
-          height: 100%;
-          background-color: var(--mat-sys-surface-container-high);
-          transition: all 0.2s ease;
-        }
-        .service-card__repo-name {
-          padding: 0.6rem 0;
-          code {
-            font-size: 0.8rem;
-            padding: 0.7rem;
-            border-radius: var(
-              --mat-card-elevated-container-shape,
-              var(--mat-sys-corner-medium)
-            );
-            background-color: var(
-              --mat-sys-surface-container-highest
-            );
-          }
-        }
-
-        .service-card__repo-desc {
-          font-weight: 100;
-          font-size: 2rem;
-          word-break: break-word;
-          padding: 0.5em 0 0;
-        }
-        .service-card__chips {
-          margin-bottom: 0.5rem;
-        }
-        .service-card__muted {
-          color: red;
-          font-size: 0.85rem;
-        }
-        .service-card__meta {
-          display: grid;
-          gap: 0.25rem;
-          font-size: 0.9rem;
-        }
-        .service-card__meta-row {
-          display: flex;
-          align-items: center;
-          gap: 0.35rem;
-          color: var(--mat-sys-on-surface-variant);
-        }
-        .service-card__meta-row.service-card--error {
-          color: #b71c1c;
-        }
-        mat-card-actions {
-          padding: 0 1rem 1rem;
-        }
-        i[class*='devicon-'] {
-          font-size: 1.5rem;
-          margin: 0.25rem;
-
-          &.dark-background {
-            background-color: rgba(0, 0, 0, 0.8);
-          }
-        }
-      }
-    `,
-  ],
+  selector: 'ngx-backstage-service-card', imports: [CommonModule, MatButtonModule, MatIconModule, StatusBadgeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    @if (viewModel(); as vm) {
+      <article class="service-card">
+        <button class="service-card__open" type="button" [attr.aria-label]="'View details ' + vm.repoName" (click)="onView()">
+          <strong [title]="vm.repoName">{{ vm.repoName }}</strong>
+          <span class="service-card__description" [title]="vm.description || 'No description provided'">{{ vm.description || 'No description provided' }}</span>
+          <span class="service-card__meta">{{ vm.lastSyncAt ? (vm.lastSyncAt | date: 'short') : 'Never synced' }} · {{ vm.topics.join(' · ') || 'No topics' }}</span>
+          @if (vm.syncStatus !== 'ok' && vm.syncError) { <span class="service-card__error" [title]="vm.syncError">{{ vm.syncError }}</span> }
+          <span class="service-card__languages">@for (lang of vm.deviconLanguages; track lang) { <i [class]="lang" aria-hidden="true"></i> }</span>
+        </button>
+        <ngx-backstage-status-badge [status]="vm.syncStatus" />
+        <button mat-icon-button type="button" [attr.aria-label]="'Refresh ' + vm.repoName" title="Refresh repository" (click)="onRefresh()"><mat-icon>refresh</mat-icon></button>
+      </article>
+    }
+  `,
+  styles: [`
+    @use '@angular/material' as mat;
+    :host { display: block; min-width: 0; @include mat.icon-button-density(-3); }
+    .service-card { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 0.5rem; padding: 4px 8px; border-bottom: 1px solid var(--ngx-color-border); background: var(--ngx-color-surface-low); }
+    .service-card__open { display: grid; gap: 2px; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--ngx-color-text); text-align: left; cursor: pointer; padding: 4px 0; }
+    .service-card__open strong { font: 600 0.75rem/1.5 var(--ngx-font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .service-card__open span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .service-card__open:focus-visible { outline: 2px solid var(--ngx-color-primary); }
+    .service-card__description { font-size: 0.75rem; }
+    .service-card__meta, .service-card__languages { color: var(--ngx-color-muted); font-size: 0.65rem; }
+    .service-card__languages:empty { display: none; }
+    .service-card__languages i { margin-right: 4px; }
+    .service-card__error { color: var(--ngx-color-error); font-size: 0.7rem; }
+    .service-card:hover { background: var(--ngx-color-surface-high); }
+  `],
 })
 export class ServiceCardComponent {
-  readonly view = output<string>();
-  readonly refresh = output<string>();
-
+  readonly view = output<string>(); readonly refresh = output<string>();
   readonly serviceSummaryDto = input.required<ServiceSummaryDto>();
-  protected readonly viewModel = computed(() => {
-    const dto = this.serviceSummaryDto();
-    return {
-      description: dto.description,
-      languages: dto.languages,
-      lastSyncAt: dto.lastSyncAt,
-      deviconLanguages:
-        dto.deviconLanguages
-          ?.slice()
-          .sort((a, b) => a.localeCompare(b)) ?? [],
-      repoName: dto.repoName,
-      syncError: dto.syncError,
-      syncStatus: dto.syncStatus,
-      topics: dto.topics,
-    };
-  });
-
-  onView() {
-    this.view.emit(this.viewModel().repoName);
-  }
-
-  onRefresh() {
-    this.refresh.emit(this.viewModel().repoName);
-  }
+  protected readonly viewModel = computed(() => ({ ...this.serviceSummaryDto(),
+    topics: this.serviceSummaryDto().topics ?? [],
+    deviconLanguages: this.serviceSummaryDto().deviconLanguages?.slice().sort((a, b) => a.localeCompare(b)) ?? [],
+  }));
+  onView() { this.view.emit(this.serviceSummaryDto().repoName); }
+  onRefresh() { this.refresh.emit(this.serviceSummaryDto().repoName); }
 }

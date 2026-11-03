@@ -1,3 +1,4 @@
+import { NgxButton } from '@tmdjr/ngx-workshop-design-system';
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -10,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'ngx-backstage-detail-error',
-  imports: [CommonModule, MatButtonModule, MatIconModule],
+  imports: [NgxButton, CommonModule, MatButtonModule, MatIconModule],
   template: `
     <section
       class="backstage-detail-error__empty"
@@ -23,7 +24,7 @@ import { MatIconModule } from '@angular/material/icon';
       </div>
       <p>Try refreshing or check your permissions.</p>
       <button
-        mat-stroked-button
+        mat-flat-button ngxButton surface="outline"
         color="primary"
         (click)="retry.emit()"
       >
@@ -40,12 +41,12 @@ import { MatIconModule } from '@angular/material/icon';
         justify-items: center;
         text-align: center;
         padding: 2rem 1rem;
-        border-radius: 12px;
-        border: 1px dashed var(--mat-sys-outline-variant, #ddd);
-        color: var(--mat-sys-on-surface-variant);
+        border-radius: var(--ngx-radius);
+        border: 1px dashed var(--ngx-color-border);
+        color: var(--ngx-color-muted);
       }
       .backstage-detail-error__empty.backstage-detail-error--error {
-        color: #b71c1c;
+        color: var(--ngx-color-error);
       }
       .backstage-detail-error__empty mat-icon {
         font-size: 42px;

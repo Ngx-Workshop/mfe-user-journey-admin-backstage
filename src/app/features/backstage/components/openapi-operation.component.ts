@@ -1,3 +1,4 @@
+import { NgxButton } from '@tmdjr/ngx-workshop-design-system';
 import { OpenApiParametersComponent } from './openapi-parameters.component';
 import {
   ChangeDetectionStrategy,
@@ -18,7 +19,7 @@ import {
 } from '../utils/openapi.utils';
 @Component({
   selector: 'ngx-backstage-openapi-operation',
-  imports: [
+  imports: [NgxButton,
     MatButtonModule,
     OpenApiMediaComponent,
     HttpMethodComponent,
@@ -100,7 +101,7 @@ import {
               documented server URL with CORS enabled to enable live
               requests.
             </p>
-            <button mat-stroked-button type="button" disabled>
+            <button mat-flat-button ngxButton surface="outline" type="button" disabled>
               Send request
             </button>
           </div>
@@ -131,20 +132,20 @@ import {
         font-size: 0.9rem;
       }
       .openapi-operation__description {
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
         margin: 0.5rem 0 0;
       }
       .openapi-operation__panel {
         display: grid;
         gap: 0.75rem;
-        border-top: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+        border-top: 1px solid var(--ngx-color-border);
         padding-top: 0.75rem;
       }
       .openapi-operation__response-block {
-        border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
-        border-radius: 8px;
+        border: 1px solid var(--ngx-color-border);
+        border-radius: var(--ngx-radius);
         padding: 0.6rem;
-        background: var(--mat-sys-surface-container-high, #fff);
+        background: var(--ngx-color-surface-high);
         display: grid;
         gap: 0.6rem;
       }
@@ -156,31 +157,31 @@ import {
       }
       .openapi-operation__status {
         font-weight: 700;
-        border: 1px solid var(--mat-sys-outline-variant, #ddd);
+        border: 1px solid var(--ngx-color-border);
         padding: 0.1rem 0.45rem;
-        border-radius: 999px;
+        border-radius: var(--ngx-radius);
         font-size: 0.75rem;
       }
       .openapi-operation__response-description {
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
         font-size: 0.85rem;
       }
       .openapi-operation__tryout {
-        border: 1px dashed var(--mat-sys-outline-variant, #ddd);
-        border-radius: 8px;
+        border: 1px dashed var(--ngx-color-border);
+        border-radius: var(--ngx-radius);
         padding: 0.75rem;
         display: grid;
         gap: 0.5rem;
       }
       .openapi-operation__tryout.openapi-operation--disabled {
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
       }
       .openapi-operation__empty {
         display: grid;
         gap: 0.35rem;
         justify-items: center;
         padding: 1.25rem;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
       }
       .openapi-operation__empty.openapi-operation--small {
         padding: 0.5rem;

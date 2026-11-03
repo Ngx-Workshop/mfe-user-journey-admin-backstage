@@ -116,10 +116,10 @@ import {
   styles: [
     `
       :host {
-        display: block;
+        display: block; min-width: 0;
       }
       .openapi-viewer__doc-header {
-        padding: 24px;
+        padding: 8px 0;
       }
       .openapi-viewer__title {
         font-weight: 700;
@@ -129,14 +129,14 @@ import {
         display: flex;
         gap: 0.75rem;
         align-items: center;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
         font-size: 0.9rem;
       }
       .openapi-viewer__body {
-        border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
-        border-radius: 8px;
+        border: 1px solid var(--ngx-color-border);
+        border-radius: var(--ngx-radius);
         padding: 0.75rem;
-        background: var(--mat-sys-surface-container-low, #fafafa);
+        background: var(--ngx-color-surface-low);
       }
       .openapi-viewer__layout {
         display: grid;
@@ -156,10 +156,10 @@ import {
         gap: 0.35rem;
         justify-items: center;
         padding: 1.25rem;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--ngx-color-muted);
       }
       .openapi-viewer__empty.openapi-viewer--error {
-        color: #b71c1c;
+        color: var(--ngx-color-error);
       }
       .openapi-viewer__empty mat-icon {
         font-size: 28px;
