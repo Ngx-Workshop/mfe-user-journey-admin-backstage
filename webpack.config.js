@@ -66,7 +66,7 @@ module.exports = withModuleFederationPlugin({
     '@tmdjr/ngx-workshop-design-system': {
       singleton: true,
       strictVersion: true,
-      requiredVersion: '^21.0.10',
+      requiredVersion: '21.0.11',
     },
 
     // RxJS + tslib
